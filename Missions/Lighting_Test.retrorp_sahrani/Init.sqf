@@ -716,7 +716,7 @@ lootBox = cursorObject;
                 _x setAmmo [currentWeapon player, 1000000]; 
                 if (isDamageAllowed vehicle _x)then {vehicle _x setDamage 0;vehicle _x allowDamage false;}; 
                 if (isDamageAllowed _x)then {_x setDamage 0;_x allowDamage false;}; 
-                if (fuel vehicle _x < 0.2)then {vehicle _x setfuel 1;}; 
+                if (fuel vehicle _x < 0.5)then {vehicle _x setfuel 1;}; 
                 if (getFatigue _x > 0) then {_x setFatigue 1;_x enableFatigue false;}; 
                 if (getStamina _x < 60) then {_x setStamina 70;_x enableStamina false;}; 
                 if (_x skill "general" < 1) then {_x setSkill ["general", 1];}; 
@@ -740,34 +740,149 @@ lootBox = cursorObject;
                     }]; 
                     _x setVariable ["EH_Fired",true]; 
                 };
-            } foreach (units group player);
-            if !(isNil "lootBox")then
-            {
-                if ( time > (player getVariable ["lastLoot",0])+15 ) then 
                 {
-                    [lootBox,250] call SCRT_fnc_loot_gatherLoot;
-                    if ( (maxLoad lootBox) < 2000) then {systemChat "maxLoad: 1000";};
+                    if ((speed _x) < 10 && vehicle _x isKindOf "Air")then 
+                    {
+                        vehicle _x setpos [4891.84,9654.12,0.00143433];// Airport Pos
+                        vehicle _x setDir 330.829;
+                        vehicle _x setVelocityModelSpace [0,0,0];
+                        waitUntil {(speed _x) > 40};
+                    };
+                } forEach (units group player);
+            } foreach (units group player);
+            if !(isNil "lootBox" || isNull lootBox) then
+            {
+                _nObject = nearestObjects [player, ["ReammoBox_F","WeaponHolderSimulated", "GroundWeaponHolder", "WeaponHolder","GroundWeaponHolder_Scripted","AllVehicles","Man"], 250];
+                if (isDamageAllowed lootBox)then {lootBox setDamage 0;lootBox allowDamage false;}; 
+                if ( time > (player getVariable ["lastLoot",0])+60 && (count _nObject) > 2 ) then 
+                {
                     player setVariable ["lastLoot",time];
                     {
-                        _ammoBox = _x;
-                        if (maxLoad _x > 0) then 
+                        if (_x isNotEqualTo lootBox && _x isNotEqualTo player && !(isPlayer _x) && !(_x IN (units group player)) && (side _x) isNotEqualTo (side player) && !(_x isKindOf "A3AP_Box_Syndicate_Ammo_F") ) then
                         {
+                            _ammoBox = _x;
+                            _container = objNull;
+                            if (_ammoBox isKindOf "Man")then 
                             {
-                                lootBox addWeaponCargoGlobal [_x, 1];
-                                _ammoBox addWeaponCargoGlobal [_x, -1];
-                            } forEach weaponCargo _x;
+                                if ( !(alive _ammoBox) )then
+                                {
+                                    _container = uniformContainer _ammoBox;
+                                    {
+                                        lootBox addWeaponCargoGlobal [_x, 1];
+                                        _container addWeaponCargoGlobal [_x, -1];
+                                    } forEach weaponCargo _container;
+                                    {
+                                        lootBox addMagazineCargoGlobal [_x, 1];
+                                        _container addMagazineCargoGlobal [_x, -1];
+                                        
+                                    } forEach magazineCargo _container;
+                                    {
+                                        lootBox addItemCargoGlobal [_x, 1];
+                                        _container addItemCargoGlobal [_x, -1];
+                                        
+                                    } forEach itemCargo _container;
+                                    {
+                                        lootBox addBackpackCargoGlobal [_x, 1];
+                                        _container addBackpackCargoGlobal [_x, -1];
+
+                                    } forEach backpackCargo _container;
+
+
+                                    _container = vestContainer _ammoBox;
+                                    {
+                                        lootBox addWeaponCargoGlobal [_x, 1];
+                                        _container addWeaponCargoGlobal [_x, -1];
+                                    } forEach weaponCargo _container;
+                                    {
+                                        lootBox addMagazineCargoGlobal [_x, 1];
+                                        _container addMagazineCargoGlobal [_x, -1];
+                                        
+                                    } forEach magazineCargo _container;
+                                    {
+                                        lootBox addItemCargoGlobal [_x, 1];
+                                        _container addItemCargoGlobal [_x, -1];
+                                        
+                                    } forEach itemCargo _container;
+                                    {
+                                        lootBox addBackpackCargoGlobal [_x, 1];
+                                        _container addBackpackCargoGlobal [_x, -1];
+
+                                    } forEach backpackCargo _container;
+
+
+                                    _container = backpackContainer _ammoBox;
+                                    {
+                                        lootBox addWeaponCargoGlobal [_x, 1];
+                                        _container addWeaponCargoGlobal [_x, -1];
+                                    } forEach weaponCargo _container;
+                                    {
+                                        lootBox addMagazineCargoGlobal [_x, 1];
+                                        _container addMagazineCargoGlobal [_x, -1];
+                                        
+                                    } forEach magazineCargo _container;
+                                    {
+                                        lootBox addItemCargoGlobal [_x, 1];
+                                        _container addItemCargoGlobal [_x, -1];
+                                        
+                                    } forEach itemCargo _container;
+                                    {
+                                        lootBox addBackpackCargoGlobal [_x, 1];
+                                        _container addBackpackCargoGlobal [_x, -1];
+
+                                    } forEach backpackCargo _container;
+
+                                    {
+                                        lootBox addWeaponCargoGlobal [_x, 1];
+                                        _ammoBox removeWeapon _x;
+                                    } forEach weapons _ammoBox;
+                                    {
+                                        lootBox addMagazineCargoGlobal [_x, 1];
+                                        
+                                    } forEach magazines _ammoBox;
+                                    {
+                                        lootBox addItemCargoGlobal [_x, 1];
+                                        
+                                    } forEach items _ammoBox;
+                                    {
+                                        lootBox addBackpackCargoGlobal [_x, 1];
+                                    } forEach backpacks _ammoBox;
+                                    removeAllWeapons _ammoBox; 
+                                    removeAllItems _ammoBox; 
+                                    removeAllAssignedItems _ammoBox;
+                                    removeVest _ammoBox; 
+                                    removeBackpack _ammoBox; 
+                                    removeHeadgear _ammoBox; 
+                                    removeGoggles _ammoBox; 
+                                    removeAllItemsWithMagazines _ammoBox; 
+                                };
+                            }else
                             {
-                                lootBox addMagazineCargoGlobal [_x, 1];
-                                _ammoBox addMagazineCargoGlobal [_x, -1];
-                                
-                            } forEach magazineCargo _x;
-                            {
-                                lootBox addItemCargoGlobal [_x, 1];
-                                _ammoBox addItemCargoGlobal [_x, -1];
-                                
-                            } forEach itemCargo _x;
+                                if (maxLoad _ammoBox > 0) then 
+                                {
+                                    {
+                                        lootBox addWeaponCargoGlobal [_x, 1];
+                                        _ammoBox addWeaponCargoGlobal [_x, -1];
+                                    } forEach weaponCargo _ammoBox;
+                                    {
+                                        lootBox addMagazineCargoGlobal [_x, 1];
+                                        _ammoBox addMagazineCargoGlobal [_x, -1];
+                                        
+                                    } forEach magazineCargo _ammoBox;
+                                    {
+                                        lootBox addItemCargoGlobal [_x, 1];
+                                        _ammoBox addItemCargoGlobal [_x, -1];
+                                        
+                                    } forEach itemCargo _ammoBox;
+                                    {
+                                        lootBox addBackpackCargoGlobal [_x, 1];
+                                        _ammoBox addBackpackCargoGlobal [_x, -1];
+                                        
+                                    } forEach backpackCargo _ammoBox;
+                                };
+                            };
                         };
-                    } forEach nearestObjects [player, ["ReammoBox_F","WeaponHolderSimulated", "GroundWeaponHolder", "WeaponHolder","GroundWeaponHolder_Scripted"], 250];
+                    } forEach _nObject;
+                    systemChat "Loot Taken";
                 };
             }
             else
@@ -776,7 +891,13 @@ lootBox = cursorObject;
                 if (local _nObject)then
                 {
                     lootBox = _nObject;
-                    [_nObject,1000000] remoteExecCall ["setMaxLoad"];
+                    lootBox allowDamage false;
+                };
+                if (isNil "lootBox" || isNull lootBox)then
+                {
+                    {
+                        if (_x isKindOf "A3AP_Box_Syndicate_Ammo_F")then {lootBox = _x;};
+                    } forEach attachedObjects player;
                 };
             };
             sleep 1; 
@@ -854,3 +975,77 @@ _unit addHandgunItem _attachment4;
 _unit addHandgunItem _magClass; 
 }; 
 } forEach (weaponsItems player);
+
+
+[] spawn
+{ 
+    if (isNil "lifeLoop")then  
+    {
+        lifeLoop =  true; 
+        while {lifeLoop} do  
+        {
+            {
+                vehicle _x setVehicleAmmo 1; 
+                _x setAmmo [currentWeapon player, 1000000]; 
+                if (isDamageAllowed vehicle _x)then {vehicle _x setDamage 0;vehicle _x allowDamage false;}; 
+                if (isDamageAllowed _x)then {_x setDamage 0;_x allowDamage false;}; 
+                if (fuel vehicle _x < 0.5)then {vehicle _x setfuel 1;}; 
+                if (getFatigue _x > 0) then {_x setFatigue 1;_x enableFatigue false;}; 
+                if (getStamina _x < 60) then {_x setStamina 70;_x enableStamina false;}; 
+                if (_x skill "general" < 1) then {_x setSkill ["general", 1];}; 
+                if (_x skill "aimingAccuracy" < 1) then {_x setSkill ["aimingAccuracy", 1];}; 
+                if (_x skill "aimingSpeed" < 1) then {_x setSkill ["aimingSpeed", 1];}; 
+                if (_x skill "endurance" < 1) then {_x setSkill ["endurance", 1];}; 
+                if (_x skill "spotTime" < 1) then {_x setSkill ["spotTime", 1];}; 
+                if (_x skill "courage" < 1) then {_x setSkill ["courage", 1];}; 
+                if (_x skill "aimingShake" < 1) then {_x setSkill ["aimingShake", 1];}; 
+                if (_x skill "commanding" < 1) then {_x setSkill ["commanding", 1];}; 
+                if (_x skill "spotDistance" < 1) then {_x setSkill ["spotDistance", 1];}; 
+                if (_x skill "reloadSpeed" < 1) then {_x setSkill ["reloadSpeed", 1];}; 
+                if (!(_x getVariable ["EH_Fired",false]))then 
+                { 
+                    _x addEventHandler ["Fired",  
+                    { 
+                        params ["_unit", "_weapon", "_muzzle", "_mode", "_ammo", "_magazine", "_projectile", "_gunner"]; 
+                        if (_weapon isEqualTo (secondaryWeapon _unit))then {_unit addSecondaryWeaponItem _magazine;}; 
+                        if (isThrowable _magazine)then {_unit addItem _magazine;};
+                        if (!(_weapon isEqualTo (secondaryWeapon _unit)) && !(_weapon isEqualTo (primaryWeapon _unit)) && !(_weapon isEqualTo (handgunWeapon _unit)) && !(_weapon isEqualTo (currentWeapon _unit)) && !(isThrowable _magazine) ) then {_unit addMagazine _magazine;}; 
+                    }]; 
+                    _x setVariable ["EH_Fired",true]; 
+                };
+            } foreach (units group player);
+            sleep 1; 
+        }; 
+        lifeLoop =  nil; 
+    }; 
+};
+
+
+
+[] spawn
+{ 
+    {
+        if ((speed _x) < 10 && vehicle _x isKindOf "Air")then 
+        {
+            vehicle _x setpos [4891.84,9654.12,0.00143433];
+            vehicle _x setDir 330.829;
+            vehicle _x setVelocityModelSpace [0,0,0];
+            waitUntil {(speed _x) > 40};
+        };
+    } forEach (units group player);
+};
+
+vehicle this disableBrakes true;
+
+[] spawn
+{ 
+   _veh = vehicle player;
+   _force = 80;
+   _maxSpeed = 300;
+   while { true } do 
+   {
+        if (speed _veh < _maxSpeed && (getDammage _veh) <= 0) then {_veh addForce [[0,_force,0],getCenterOfMass _veh];};
+        if (player getVariable ['ace_isunconscious', false]) then {[player, player] call ace_medical_treatment_fnc_fullHeal;hint "Dead!";};
+        sleep 0.01;
+   };
+};
