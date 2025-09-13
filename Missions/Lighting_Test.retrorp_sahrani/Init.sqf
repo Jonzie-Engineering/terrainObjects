@@ -708,7 +708,8 @@ lootBox = cursorObject;
 { 
     if (isNil "lifeLoop")then  
     {
-        lifeLoop =  true; 
+        lifeLoop =  true;
+        lootBox = objNull;
         while {lifeLoop} do  
         {
             {
@@ -743,14 +744,16 @@ lootBox = cursorObject;
                 {
                     if ((speed _x) < 10 && vehicle _x isKindOf "Air")then 
                     {
-                        vehicle _x setpos [4891.84,9654.12,0.00143433];// Airport Pos
-                        vehicle _x setDir 330.829;
+                        _ilsPos = getArray (configFile >> "CfgWorlds" >>  worldName >> "ilsPosition");
+                        _ilsDir = getArray (configFile >> "CfgWorlds" >>  worldName >> "ilsDirection");
+                        vehicle _x setpos _ilsPos;// Airport Pos
+                        vehicle _x setVectorDir _ilsDir;
                         vehicle _x setVelocityModelSpace [0,0,0];
-                        waitUntil {(speed _x) > 40};
+                        waitUntil {(speed _x) > 100};
                     };
                 } forEach (units group player);
             } foreach (units group player);
-            if !(isNil "lootBox" || isNull lootBox) then
+            if !(isNull lootBox) then
             {
                 _nObject = nearestObjects [player, ["ReammoBox_F","WeaponHolderSimulated", "GroundWeaponHolder", "WeaponHolder","GroundWeaponHolder_Scripted","AllVehicles","Man"], 250];
                 if (isDamageAllowed lootBox)then {lootBox setDamage 0;lootBox allowDamage false;}; 
@@ -884,6 +887,7 @@ lootBox = cursorObject;
                     } forEach _nObject;
                     systemChat "Loot Taken";
                 };
+                if (getDammage lootBox > 0.1) then {deleteVehicle lootBox;lootBox = objNull;};
             }
             else
             {
@@ -893,7 +897,7 @@ lootBox = cursorObject;
                     lootBox = _nObject;
                     lootBox allowDamage false;
                 };
-                if (isNil "lootBox" || isNull lootBox)then
+                if (isNull lootBox)then
                 {
                     {
                         if (_x isKindOf "A3AP_Box_Syndicate_Ammo_F")then {lootBox = _x;};
