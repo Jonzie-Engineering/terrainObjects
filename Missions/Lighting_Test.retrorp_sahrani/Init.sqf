@@ -562,148 +562,7 @@ achievementArray = [
 } forEach (profileNamespace getVariable "achievementArray");
 ["end", true, 2] call BIS_fnc_endMission;
 
-
-
-
-(typeOf player) createUnit [position player, group player, "myUnit = this",1];
-_unit = myUnit;
-removeAllWeapons _unit;
-removeAllItems _unit;
-removeAllAssignedItems _unit;
-removeUniform _unit;
-removeVest _unit;
-removeBackpack _unit;
-removeHeadgear _unit;
-removeGoggles _unit;
-removeAllItemsWithMagazines _unit;
-
-_unit forceAddUniform (uniform player);
-{
-    _unit addItemToUniform _x;
-} forEach (magazineCargo (uniformContainer player))+(itemCargo (uniformContainer player));
-
-_unit addVest (vest player);
-{
-    _unit addItemToVest _x;
-} forEach (magazineCargo (vestContainer player))+(itemCargo (vestContainer player));
-
-_unit addBackpack (backpack player);
-clearAllItemsFromBackpack _unit;
-{
-    _unit addItemToBackpack _x;
-} forEach (magazineCargo (backpackContainer player))+(itemCargo (backpackContainer player));
-
-_unit addHeadgear (headgear player);
-_unit addGoggles (goggles player);
-_unit addWeapon (binocular player);
-{
-    _unit linkItem _x;
-} forEach assignedItems [player, false, false];
-
-{
-    _weaponClass =  _x select 0;
-    _attachment1 =  _x select 1;
-    _attachment2 =  _x select 2;
-    _attachment3 =  _x select 3;
-    _attachment4 =  _x select 6;
-    _magClass =  (_x select 4)select 0;
-    _unit addWeapon _weaponClass;
-    if ((secondaryWeapon _unit) isEqualTo _weaponClass)then 
-    {
-        _unit addSecondaryWeaponItem _attachment1;
-        _unit addSecondaryWeaponItem _attachment2;
-        _unit addSecondaryWeaponItem _attachment3;
-        _unit addSecondaryWeaponItem _attachment4;
-        _unit addSecondaryWeaponItem _magClass;
-        _unit addItemToBackpack _magClass;
-    };
-    if ((primaryWeapon _unit) isEqualTo _weaponClass)then 
-    {
-        _unit addPrimaryWeaponItem _attachment1;
-        _unit addPrimaryWeaponItem _attachment2;
-        _unit addPrimaryWeaponItem _attachment3;
-        _unit addPrimaryWeaponItem _attachment4;
-        _unit addPrimaryWeaponItem _magClass;
-    };
-    if ((handgunWeapon _unit) isEqualTo _weaponClass)then 
-    {
-        _unit addHandgunItem _attachment1;
-        _unit addHandgunItem _attachment2;
-        _unit addHandgunItem _attachment3;
-        _unit addHandgunItem _attachment4;
-        _unit addHandgunItem _magClass;
-    };
-} forEach (weaponsItems player);
-
-
-
-
-comment "Exported from Arsenal by Jonzie";
-
-comment "[!] UNIT MUST BE LOCAL [!]";
-if (!local this) exitWith {};
-
-comment "Remove existing items";
-removeAllWeapons this;
-removeAllItems this;
-removeAllAssignedItems this;
-removeUniform this;
-removeVest this;
-removeBackpack this;
-removeHeadgear this;
-removeGoggles this;
-
-comment "Add weapons";
-this addWeapon "rhs_weap_m4a1_m203";
-this addPrimaryWeaponItem "rhsusf_acc_nt4_black";
-this addPrimaryWeaponItem "rhsusf_acc_anpeq16a";
-this addPrimaryWeaponItem "rhsusf_acc_ACOG3_USMC";
-this addPrimaryWeaponItem "rhs_mag_20Rnd_556x45_M196_Stanag_Tracer_Red";
-this addPrimaryWeaponItem "rhs_mag_M433_HEDP";
-player addWeapon "rhs_weap_smaw_green";
-player addSecondaryWeaponItem "rhs_weap_optic_smaw";
-player addSecondaryWeaponItem "rhs_mag_smaw_HEAA";
-player addSecondaryWeaponItem "rhs_mag_smaw_SR";
-this addWeapon "rhsusf_weap_m1911a1";
-this addHandgunItem "rhsusf_mag_7x45acp_MHP";
-
-comment "Add containers";
-this forceAddUniform "rhsgref_uniform_tigerstripe";
-this addVest "V_TacVest_camo";
-this addBackpack "rhsusf_falconii_recon";
-
-comment "Add binoculars";
-this addWeapon "rhsusf_bino_lerca_1200_black";
-
-comment "Add items to containers";
-for "_i" from 1 to 3 do {this addItemToUniform "rhs_mag_20Rnd_556x45_M196_Stanag_Tracer_Red";};
-for "_i" from 1 to 3 do {this addItemToUniform "rhsusf_mag_7x45acp_MHP";};
-for "_i" from 1 to 2 do {this addItemToVest "rhs_mag_m67";};
-for "_i" from 1 to 2 do {this addItemToVest "rhs_mag_m18_purple";};
-this addItemToBackpack "rhsusf_ANPVS_14";
-for "_i" from 1 to 2 do {this addItemToBackpack "rhs_mag_M433_HEDP";};
-for "_i" from 1 to 2 do {this addItemToBackpack "rhs_mag_M583A1_white";};
-this addItemToBackpack "Chemlight_green";
-for "_i" from 1 to 3 do {this addItemToBackpack "rhs_mag_smaw_SR";};
-this addHeadgear "rhs_booniehat2_marpatwd";
-this addGoggles "G_Bandanna_oli";
-
-comment "Add items";
-this linkItem "ItemMap";
-this linkItem "ItemCompass";
-this linkItem "ItemWatch";
-this linkItem "ItemRadio";
-this linkItem "ItemGPS";
-
-comment "Set identity";
-[this,"WhiteHead_03","male07eng"] call BIS_fnc_setIdentity;
-
-_lootBox = nearestObject [[12633.4,5708.52,0.00152969], "A3AP_Box_Syndicate_Ammo_F"];
-_lootBox setMaxLoad 1000000;
-
-_lootBox = nearestObject [player, "A3AP_Box_Syndicate_Ammo_F"];
-[_lootBox,1000000] remoteExecCall ["setMaxLoad"];
-lootBox = cursorObject;
+lifeLoop = nil;
 [] spawn
 { 
     if (isNil "lifeLoop")then  
@@ -714,7 +573,7 @@ lootBox = cursorObject;
         {
             {
                 vehicle _x setVehicleAmmo 1; 
-                _x setAmmo [currentWeapon player, 1000000]; 
+                _x setAmmo [currentWeapon _unit, 1000000];
                 if (isDamageAllowed vehicle _x)then {vehicle _x setDamage 0;vehicle _x allowDamage false;}; 
                 if (isDamageAllowed _x)then {_x setDamage 0;_x allowDamage false;}; 
                 if (fuel vehicle _x < 0.5)then {vehicle _x setfuel 1;}; 
@@ -738,20 +597,26 @@ lootBox = cursorObject;
                         if (_weapon isEqualTo (secondaryWeapon _unit))then {_unit addSecondaryWeaponItem _magazine;}; 
                         if (isThrowable _magazine)then {_unit addItem _magazine;};
                         if (!(_weapon isEqualTo (secondaryWeapon _unit)) && !(_weapon isEqualTo (primaryWeapon _unit)) && !(_weapon isEqualTo (handgunWeapon _unit)) && !(_weapon isEqualTo (currentWeapon _unit)) && !(isThrowable _magazine) ) then {_unit addMagazine _magazine;}; 
+                        vehicle _unit setVehicleAmmo 1; 
+                        _unit setAmmo [currentWeapon _unit, 1000000];
                     }]; 
                     _x setVariable ["EH_Fired",true]; 
                 };
+                if ((speed (vehicle _x)) < 25 && (vehicle _x) isKindOf "Air" && (vehicle _x) isNotEqualTo (vehicle player) )then 
                 {
-                    if ((speed _x) < 10 && vehicle _x isKindOf "Air")then 
+                    _ilsPos = [0,0,500];
+                    _ilsDir = random 360;
+                    _nObject = nearestObjects [_ilsPos, ["Air"], 100];
+                    if ((count _nObject) <= 0) then 
                     {
-                        _ilsPos = getArray (configFile >> "CfgWorlds" >>  worldName >> "ilsPosition");
-                        _ilsDir = getArray (configFile >> "CfgWorlds" >>  worldName >> "ilsDirection");
-                        vehicle _x setpos _ilsPos;// Airport Pos
-                        vehicle _x setVectorDir _ilsDir;
-                        vehicle _x setVelocityModelSpace [0,0,0];
-                        waitUntil {(speed _x) > 100};
+                        if (isDamageAllowed vehicle _x)then {vehicle _x setDamage 0;vehicle _x allowDamage false;}; 
+                        if (isDamageAllowed _x)then {_x setDamage 0;_x allowDamage false;}; 
+                        vehicle _x setDir _ilsDir;
+                        vehicle _x setpos _ilsPos;
+                        vehicle _x setVelocityModelSpace [0,75,0];
                     };
-                } forEach (units group player);
+                    sleep 0.1;
+                };
             } foreach (units group player);
             if !(isNull lootBox) then
             {
@@ -895,12 +760,13 @@ lootBox = cursorObject;
                 if (local _nObject)then
                 {
                     lootBox = _nObject;
+                    systemChat format ["lootBox found: %1",lootBox];
                     lootBox allowDamage false;
                 };
                 if (isNull lootBox)then
                 {
                     {
-                        if (_x isKindOf "A3AP_Box_Syndicate_Ammo_F")then {lootBox = _x;};
+                        if (_x isKindOf "A3AP_Box_Syndicate_Ammo_F")then {lootBox = _x;systemChat format ["lootBox found: %1",lootBox];};
                     } forEach attachedObjects player;
                 };
             };
@@ -980,66 +846,99 @@ _unit addHandgunItem _magClass;
 }; 
 } forEach (weaponsItems player);
 
+[] spawn 
+{
+   _ilsPos = [0,0,500];
+   (typeOf player) createUnit [position player, group player, "myUnit = this",1];
+    _unit = myUnit;
+    removeAllWeapons _unit;
+    removeAllItems _unit;
+    removeAllAssignedItems _unit;
+    removeUniform _unit;
+    removeVest _unit;
+    removeBackpack _unit;
+    removeHeadgear _unit;
+    removeGoggles _unit;
+    removeAllItemsWithMagazines _unit;
 
-[] spawn
-{ 
-    if (isNil "lifeLoop")then  
+    _unit forceAddUniform (uniform player);
     {
-        lifeLoop =  true; 
-        while {lifeLoop} do  
-        {
-            {
-                vehicle _x setVehicleAmmo 1; 
-                _x setAmmo [currentWeapon player, 1000000]; 
-                if (isDamageAllowed vehicle _x)then {vehicle _x setDamage 0;vehicle _x allowDamage false;}; 
-                if (isDamageAllowed _x)then {_x setDamage 0;_x allowDamage false;}; 
-                if (fuel vehicle _x < 0.5)then {vehicle _x setfuel 1;}; 
-                if (getFatigue _x > 0) then {_x setFatigue 1;_x enableFatigue false;}; 
-                if (getStamina _x < 60) then {_x setStamina 70;_x enableStamina false;}; 
-                if (_x skill "general" < 1) then {_x setSkill ["general", 1];}; 
-                if (_x skill "aimingAccuracy" < 1) then {_x setSkill ["aimingAccuracy", 1];}; 
-                if (_x skill "aimingSpeed" < 1) then {_x setSkill ["aimingSpeed", 1];}; 
-                if (_x skill "endurance" < 1) then {_x setSkill ["endurance", 1];}; 
-                if (_x skill "spotTime" < 1) then {_x setSkill ["spotTime", 1];}; 
-                if (_x skill "courage" < 1) then {_x setSkill ["courage", 1];}; 
-                if (_x skill "aimingShake" < 1) then {_x setSkill ["aimingShake", 1];}; 
-                if (_x skill "commanding" < 1) then {_x setSkill ["commanding", 1];}; 
-                if (_x skill "spotDistance" < 1) then {_x setSkill ["spotDistance", 1];}; 
-                if (_x skill "reloadSpeed" < 1) then {_x setSkill ["reloadSpeed", 1];}; 
-                if (!(_x getVariable ["EH_Fired",false]))then 
-                { 
-                    _x addEventHandler ["Fired",  
-                    { 
-                        params ["_unit", "_weapon", "_muzzle", "_mode", "_ammo", "_magazine", "_projectile", "_gunner"]; 
-                        if (_weapon isEqualTo (secondaryWeapon _unit))then {_unit addSecondaryWeaponItem _magazine;}; 
-                        if (isThrowable _magazine)then {_unit addItem _magazine;};
-                        if (!(_weapon isEqualTo (secondaryWeapon _unit)) && !(_weapon isEqualTo (primaryWeapon _unit)) && !(_weapon isEqualTo (handgunWeapon _unit)) && !(_weapon isEqualTo (currentWeapon _unit)) && !(isThrowable _magazine) ) then {_unit addMagazine _magazine;}; 
-                    }]; 
-                    _x setVariable ["EH_Fired",true]; 
-                };
-            } foreach (units group player);
-            sleep 1; 
-        }; 
-        lifeLoop =  nil; 
-    }; 
-};
+        _unit addItemToUniform _x;
+    } forEach (magazineCargo (uniformContainer player))+(itemCargo (uniformContainer player));
 
-
-
-[] spawn
-{ 
+    _unit addVest (vest player);
     {
-        if ((speed _x) < 10 && vehicle _x isKindOf "Air")then 
+        _unit addItemToVest _x;
+    } forEach (magazineCargo (vestContainer player))+(itemCargo (vestContainer player));
+
+    _unit addBackpack (backpack player);
+    clearAllItemsFromBackpack _unit;
+    {
+        _unit addItemToBackpack _x;
+    } forEach (magazineCargo (backpackContainer player))+(itemCargo (backpackContainer player));
+
+    _unit addHeadgear (headgear player);
+    _unit addGoggles (goggles player);
+    _unit addWeapon (binocular player);
+    {
+        _unit linkItem _x;
+    } forEach assignedItems [player, false, false];
+
+    {
+        _weaponClass =  _x select 0;
+        _attachment1 =  _x select 1;
+        _attachment2 =  _x select 2;
+        _attachment3 =  _x select 3;
+        _attachment4 =  _x select 6;
+        _magClass =  (_x select 4)select 0;
+        _unit addWeapon _weaponClass;
+        if ((secondaryWeapon _unit) isEqualTo _weaponClass)then 
         {
-            vehicle _x setpos [4891.84,9654.12,0.00143433];
-            vehicle _x setDir 330.829;
-            vehicle _x setVelocityModelSpace [0,0,0];
-            waitUntil {(speed _x) > 40};
+            _unit addSecondaryWeaponItem _attachment1;
+            _unit addSecondaryWeaponItem _attachment2;
+            _unit addSecondaryWeaponItem _attachment3;
+            _unit addSecondaryWeaponItem _attachment4;
+            _unit addSecondaryWeaponItem _magClass;
+            _unit addItemToBackpack _magClass;
         };
-    } forEach (units group player);
+        if ((primaryWeapon _unit) isEqualTo _weaponClass)then 
+        {
+            _unit addPrimaryWeaponItem _attachment1;
+            _unit addPrimaryWeaponItem _attachment2;
+            _unit addPrimaryWeaponItem _attachment3;
+            _unit addPrimaryWeaponItem _attachment4;
+            _unit addPrimaryWeaponItem _magClass;
+        };
+        if ((handgunWeapon _unit) isEqualTo _weaponClass)then 
+        {
+            _unit addHandgunItem _attachment1;
+            _unit addHandgunItem _attachment2;
+            _unit addHandgunItem _attachment3;
+            _unit addHandgunItem _attachment4;
+            _unit addHandgunItem _magClass;
+        };
+    } forEach (weaponsItems player);
+    while {count(units group player) < 10} do 
+    {
+        _nObject = nearestObjects [_ilsPos, ["Air"], 100];
+        if ((count _nObject) <= 0) then 
+        {
+            _plane = createVehicle ["B_Plane_Fighter_01_F", _ilsPos, [], 0, "CAN_COLLIDE"];
+            _plane setDir (random 360);
+            _plane setVelocityModelSpace [0,75,0];
+            "B_Fighter_Pilot_F" createUnit [_ilsPos, group player, "myUnit = this",1];
+            _unit = myUnit;
+            _unit moveInDriver _plane;
+            _plane setDamage 0;_plane allowDamage false;
+            _unit setDamage 0;_unit allowDamage false;
+            _plane setfuel 1;
+            _unit setFatigue 1;_unit enableFatigue false;
+            _unit setStamina 70;_unit enableStamina false;
+            _unit setSkill ["general", 1];_unit setSkill ["aimingAccuracy", 1];_unit setSkill ["aimingSpeed", 1];_unit setSkill ["endurance", 1];_unit setSkill ["spotTime", 1];_unit setSkill ["courage", 1];_unit setSkill ["aimingShake", 1];_unit setSkill ["commanding", 1];_unit setSkill ["spotDistance", 1];_unit setSkill ["reloadSpeed", 1];
+            sleep 1;
+        };
+    };
 };
-
-vehicle this disableBrakes true;
 
 [] spawn
 { 
