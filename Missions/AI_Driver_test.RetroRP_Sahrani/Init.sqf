@@ -71,12 +71,12 @@ ServerModules_fnc_GPS_findNode =
 ServerModules_fnc_GPS_removeMarkers = 
 {
     {
-    deleteMarker _x;
+        deleteMarker _x;
     } forEach NavPath;
-
     {
         deleteMarker _x;
     } forEach CurrentPath;
+    CurrentPath = [];
 };
 ServerModules_fnc_GPS_AStar = 
 {
@@ -140,13 +140,15 @@ ServerModules_fnc_GPS_AStar =
     private _startNode = [_start,_start,_end] call ServerModules_fnc_GPS_nodeInfo;
     private _openNodes = [_startNode]; // Nodes to be evaluated
     private _closedNodes = [];         // Nodes already evaluated
+    private _currentNodeCount = 0;
+    private _lastNodeCount = 0;
 
     // Main A* search loop
     while {count _openNodes > 0} do {
         // Exit if the route calculation index has changed (another calculation started)
-        if (StartIndex != _index) exitWith {};
+        if (StartIndex != _index) exitWith {_returnMessage = "";};
         // Timeout after 2 minutes to prevent infinite loops
-        if (time - _startTime > 120) exitWith { CalculatingRoute = false; _returnMessage = "A route could not be calculated in less than two minutes!";[] spawn ServerModules_fnc_GPS_removeMarkers; };
+        //if (time - _startTime > 600) exitWith { CalculatingRoute = false; _returnMessage = "A route could not be calculated in less than ten minutes!";[] spawn ServerModules_fnc_GPS_removeMarkers; };
 
         // Find the node in OPEN with the lowest f_cost (best candidate)
         private _currentNode = _nodes # 0;
@@ -162,7 +164,9 @@ ServerModules_fnc_GPS_AStar =
 
         // Remove current node from OPEN and add to CLOSED
         _openNodes = _openNodes - [_currentNode];
-        _closedNodes pushBack _currentNode;
+        _lastNodeCount = count _closedNodes;
+        _closedNodes pushBackUnique _currentNode;
+        if ( (count _closedNodes) > _lastNodeCount )then { _currentNodeCount = count _closedNodes; };
 
         // If the current node is the target, reconstruct the path and exit
         if ((_currentNode # 0) isEqualTo _end) exitWith { 
@@ -213,6 +217,8 @@ ServerModules_fnc_GPS_AStar =
                 };
             };
         } forEach ([_currentNode] call ServerModules_fnc_GPS_FindNeighbors);
+        hint format ["Notes:%1",count _closedNodes];
+        if (_currentNodeCount == _lastNodeCount)exitwith {CalculatingRoute = false;[] spawn ServerModules_fnc_GPS_removeMarkers;_returnMessage = "A route could not be found!"; };
     };
     
     // If no route was found, return a failure message
@@ -420,6 +426,10 @@ ServerModules_fnc_GPS_InitClient =
             private _obj = "Sign_Arrow_F" createVehicleLocal [0,0,0]; // Create a local arrow sign object
             private _obj1 = "Sign_Arrow_F" createVehicleLocal [0,0,0]; // Create a local arrow sign object
             private _obj2 = "Sign_Arrow_F" createVehicleLocal [0,0,0]; // Create a local arrow sign object
+            
+            _obj setObjectTexture [0, "#(rgb,8,8,3)color(1,0,0,0)"];
+            _obj1 setObjectTexture [0, "#(rgb,8,8,3)color(1,0,0,0)"];
+            _obj2 setObjectTexture [0, "#(rgb,8,8,3)color(1,0,0,0)"];
             //hideObject _obj; // Hide the object so it's not visible to players
             //hideObject _obj1; // Hide the object so it's not visible to players
             //hideObject _obj2; // Hide the object so it's not visible to players
@@ -441,8 +451,8 @@ ServerModules_fnc_GPS_InitClient =
             roadHelpers pushBack _obj2;
 
             if (isNil "debugPath") then {debugPath = [];};
-            if (isNil "RPF_Debug2") then {RPF_Debug2 = false;};
-            if (RPF_Debug2) then 
+            if (isNil "RPP_GPSDebug") then {RPP_GPSDebug = false;};
+            if (RPP_GPSDebug) then 
             {
                 private _markerName = createMarker [str _forEachIndex, (getPosATL _x)];
                 _markerName setMarkerDir (_begPos getDir _endPos);
@@ -621,7 +631,7 @@ ServerModules_fnc_createTaxi =
     if ( (!(isUsingAISteeringComponent)) && isAISteeringComponentEnabled _veh ) then {useAISteeringComponent true;};
     _veh forceFollowRoad true;
 
-    player moveInCargo _veh;
+    //player moveInCargo _veh;
 };
 ServerModules_fnc_createTaxiDriver = 
 {
@@ -634,7 +644,7 @@ ServerModules_fnc_createTaxiDriver =
     //private _drv = createAgent ["C_man_1", [0,0,0], [], 0, "NONE"];
     // Handle hidden mode logic
     
-    if (_veh getVariable ["RRP_taxiHidden", false])then
+    if (_veh getVariable ["RRP_hiddenObject", false])then
     {
         // Create the taxi locally and hide it along with the player and driver
         [_drv, true] remoteExecCall ['hideObjectGlobal', 2];_drv hideObject false;
@@ -658,7 +668,6 @@ ServerModules_fnc_createTaxiDriver =
     _drv disableAI "AUTOCOMBAT";
     _drv disableAI "CHECKVISIBLE";
     _drv allowFleeing 0;
-    _drv setBehaviourStrong "CARELESS";
     _drv setCombatBehaviour "CARELESS";
 
     // Set driver skills to maximum
@@ -672,30 +681,34 @@ ServerModules_fnc_createTaxiDriver =
     _drv setSkill ["general",1];
     _drv setSkill ["aimingShake",1];
     _veh forceFollowRoad true;
+    (group _drv) setSpeedMode "LIMITED";
+    (group _drv) setBehaviourStrong "CARELESS";
+    
     _drv
 };
 ServerModules_fnc_createTaxiRoute = 
 {
-    params [ ["_dest", [0,0,0]], ["_veh", vehicle player] ];
-    if ( _dest isEqualTo [0,0,0] ) exitWith { };
-    
-    if (isNull _veh || _veh isKindOf "Man") exitWith { };
+    params [ ["_dest", [0,0,0]], ["_veh", vehicle player], ["_mode", -1] ];
+    if ( _dest isEqualTo [0,0,0] || isNull _veh || _veh isKindOf "Man" ) exitWith { };
 
-    
+    private _drv = objNull;
+    private _startIndex = 0;
     _drv = driver _veh;
-    doStop _drv;
-    waitUntil {speed _veh < 1};
-
-    if (_veh getVariable ["RRP_taxiOnRoute", false])then { deleteVehicle (driver _veh); waitUntil { !alive (driver _veh) };};
-    private _drv = [_veh] call ServerModules_fnc_createTaxiDriver;
+    if (isNull _drv) then { _drv = [_veh] call ServerModules_fnc_createTaxiDriver; };
+    if (isNull _drv) exitwith {};
     
-    if (isNull _drv) exitWith { };
+    if (_veh getVariable ["RRP_taxiOnRoute", false])then {doStop _drv;waitUntil {speed _veh < 1};};
+    //_drv doMove _dest;
     
     private _start = getPosATL _veh;
     
-    waitUntil {GPSInitialized};
-    StartIndex = StartIndex + 1;
-    [_start, _dest, StartIndex] spawn ServerModules_fnc_GPS_FindPath;
+    if (_mode < 0) then 
+    {
+        waitUntil {GPSInitialized};
+        if (_startIndex < 0) then {_startIndex = StartIndex + 1;};
+        [_start, _dest, _startIndex] spawn ServerModules_fnc_GPS_FindPath;
+    };
+    
     //_veh setPhysicsCollisionFlag false;
 
     waitUntil {(count CurrentPath) > 0};
@@ -709,14 +722,76 @@ ServerModules_fnc_createTaxiRoute =
     // Now use setDriveOnPath with both points 
     _veh setDriveOnPath _route;
     
-    _drv setVariable ["RRP_taxiRoute", _route, true];
-    _drv setVariable ["RRP_taxiOnRoute", true, true];
-
     _veh setVariable ["RRP_taxiRoute", _route, true];
     _veh setVariable ["RRP_taxiOnRoute", true, true];
-    _veh setVariable ["RRP_taxiHidden", true, true];
+    _veh setVariable ["RRP_hiddenObject", true, true];
+    if !(_veh getVariable ["RRP_taxiLoop", false]) then {[_veh] spawn ServerModules_fnc_taxiLoop;};
+    player moveInCargo _veh;
 };
+ServerModules_fnc_taxiLoop = 
+{
+    params [ ["_veh", objNull] ];
+    
+    if (isNull _veh) exitwith {};
+    _veh setVariable ["RRP_taxiLoop", true, true];
 
+    private _pausePos = getPos _veh;
+    private _pauseTime = time;
+
+    // Loop runs as long as taxi is on route
+    while { _veh getVariable ["RRP_taxiOnRoute", false] } do 
+    {
+        private _currentPos = getPos _veh;
+        private _distMoved = _pausePos distance2D _currentPos;
+
+        // If vehicle has moved more than 5 meters, reset pause position and timer
+        if (_distMoved > 5) then {
+            _pausePos = _currentPos;
+            _pauseTime = time;
+        };
+
+        // If vehicle hasn't moved for 20 seconds, consider it stuck and stop the taxi
+        if ((time - _pauseTime) > 20) then {
+            doStop driver _veh;
+            _pauseTime = time; // Prevent repeated stopping
+            _veh setVariable ["RRP_taxiOnRoute", false, true];
+        };
+
+        // Refuel if needed
+        if ((fuel _veh) < 0.1) then { _veh setFuel 1; };
+
+        // If no passengers, stop the car
+        if (count crew _veh == 0) then {
+            doStop driver _veh;
+            _veh setVariable ["RRP_taxiOnRoute", false, true];
+        };
+
+        {
+            if ( ( (getMarkerPos _x ) distance2D (getPos _veh) ) < 15 ) exitwith 
+            {
+                CurrentPath = CurrentPath - [_x];
+                deleteMarker _x;
+                hint format ["Point removed %1",count CurrentPath];
+            };
+        } forEach CurrentPath;
+
+        if (count CurrentPath < 1) then {
+            doStop driver _veh;
+            _veh setVariable ["RRP_taxiOnRoute", false, true];
+            _veh setVariable ["RRP_taxiRoute", nil, true];
+            _veh setVariable ["RRP_hiddenObject", false, true];
+        };
+        sleep 0.5;
+    };
+    _veh setVariable ["RRP_taxiLoop", false, true];
+    _veh setVariable ["RRP_taxiOnRoute", false, true];
+   
+    if ( _veh getVariable ["RRP_taxiAutoRestart", false] ) then 
+    {
+        private _dest = getMarkerPos (selectMax CurrentPath);
+        [_dest,_veh,1] spawn ServerModules_fnc_createTaxiRoute;
+    }else{[] call ServerModules_fnc_GPS_removeMarkers;};
+};
 ServerModules_fnc_TaxiDrive = 
 {
     params [ ["_start", [0,0,0]], ["_dest", [0,0,0]] , ["_dir", -1] , ["_hiddenMode", false]];
@@ -814,15 +889,23 @@ ServerModules_fnc_TaxiDrive =
     hint format ["newDest: %1", _newDest];
     _drv doMove _newDest;
 };
+ServerModules_fnc_lockInventory = {};
+ServerModules_fnc_customize_Vehicles = {};
+ServerModules_fnc_ToggleLight = {};
+
+_startPos = [6345.8,7457.09,0];
+[_startPos,90] call ServerModules_fnc_createTaxi;
+[[12140.4,17787.9,0],nearestObject [_startPos,"RetroRP_Monaco"]] spawn ServerModules_fnc_createTaxiRoute;
 
 
-
-[[9933.85,9951.83,0],90] call ServerModules_fnc_createTaxi;
-sleep 1;
 //GPSEnabled = true;
+
 
 addMissionEventHandler ["MapSingleClick", 
 {
     params ["_units", "_pos", "_alt", "_shift"];
     [_pos] spawn ServerModules_fnc_createTaxiRoute;
 }];
+
+waitUntil {vehicle player != player};
+vehicle player setVariable ["RRP_taxiAutoRestart", true];
