@@ -11,8 +11,8 @@ ServerModules_fnc_GPS_nodeInfo =
     private _nodeInfo = _obj getVariable ["GPSNodeInfo",[]];
     if ((count _nodeInfo) < 1) exitWith {_returnMessage};
     
-    _obj = _nodeInfo select 0;
-    _pos = _nodeInfo select 1;
+    if (typeName _obj isEqualTo "ARRAY")then {_obj = _nodeInfo select 0;};
+    if (typeName _pos isEqualTo "OBJECT")then {_pos = _nodeInfo select 1;};
     private _begPos = _nodeInfo select 2;
     private _begObj = _nodeInfo select 3;
     private _endPos = _nodeInfo select 4;
@@ -70,13 +70,18 @@ ServerModules_fnc_GPS_findNode =
 };
 ServerModules_fnc_GPS_removeMarkers = 
 {
+    params [["_reverse", false]];
+    if (_reverse)then {_NavPath = reverse NavPath;_CurrentPath = reverse CurrentPath;}else{_NavPath = NavPath;_CurrentPath =  CurrentPath;};
+    if ( ( (count CurrentPath)+(count NavPath) ) > 1000 && ! _reverse ) then {[true] call ServerModules_fnc_GPS_removeMarkers;};
     {
         deleteMarker _x;
+        NavPath = NavPath - [_x];
     } forEach NavPath;
     {
         deleteMarker _x;
+        CurrentPath = CurrentPath - [_x];
     } forEach CurrentPath;
-    CurrentPath = [];
+    
 };
 ServerModules_fnc_GPS_AStar = 
 {
@@ -264,6 +269,7 @@ ServerModules_fnc_GPS_FindNeighbors =
     private _radius = _roadWidth;
     
     _obj = _nodeInfo select 0;
+    if (typeName _obj isEqualTo "ARRAY")then {_obj = _nodeInfo select 0;};
     private _pos = _nodeInfo select 1;
     private _begPos = _nodeInfo select 2;
     private _begObj = _nodeInfo select 3;
@@ -276,7 +282,7 @@ ServerModules_fnc_GPS_FindNeighbors =
 
     if (_roadInfo select 8)then 
     {
-        if ( count(nearestObjects [_nodePos, ["Land_RetroRP_Lift_Bridge"], 100]) > 0) then {_radius = 50;}else{_radius = 15;};
+        if ( count(nearestObjects [_nodePos, ["Land_RetroRP_Lift_Bridge"], 100]) > 0) then {_radius = 50;}else{_radius = 15;};//_radius = 50;
     };
 
     {
@@ -783,14 +789,16 @@ ServerModules_fnc_taxiLoop =
         };
         sleep 0.5;
     };
-    _veh setVariable ["RRP_taxiLoop", false, true];
-    _veh setVariable ["RRP_taxiOnRoute", false, true];
-   
-    if ( _veh getVariable ["RRP_taxiAutoRestart", false] ) then 
+    if ( _veh getVariable ["RRP_taxiAutoRestart", false] && _veh getVariable ["RRP_taxiOnRoute", false] ) then 
     {
         private _dest = getMarkerPos (selectMax CurrentPath);
         [_dest,_veh,1] spawn ServerModules_fnc_createTaxiRoute;
     }else{[] call ServerModules_fnc_GPS_removeMarkers;};
+
+
+    _veh setVariable ["RRP_taxiLoop", false, true];
+    _veh setVariable ["RRP_taxiOnRoute", false, true];
+   
 };
 ServerModules_fnc_TaxiDrive = 
 {
@@ -895,7 +903,7 @@ ServerModules_fnc_ToggleLight = {};
 
 _startPos = [6345.8,7457.09,0];
 [_startPos,90] call ServerModules_fnc_createTaxi;
-[[12140.4,17787.9,0],nearestObject [_startPos,"RetroRP_Monaco"]] spawn ServerModules_fnc_createTaxiRoute;
+[[6403.4,7304.02,0],nearestObject [_startPos,"RetroRP_Monaco"]] spawn ServerModules_fnc_createTaxiRoute;
 
 
 //GPSEnabled = true;
