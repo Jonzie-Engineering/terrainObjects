@@ -81,7 +81,6 @@ ServerModules_fnc_GPS_removeMarkers =
         deleteMarker _x;
         CurrentPath = CurrentPath - [_x];
     } forEach CurrentPath;
-    
 };
 ServerModules_fnc_GPS_AStar = 
 {
@@ -222,7 +221,6 @@ ServerModules_fnc_GPS_AStar =
                 };
             };
         } forEach ([_currentNode] call ServerModules_fnc_GPS_FindNeighbors);
-        hint format ["Notes:%1",count _closedNodes];
         if (_currentNodeCount == _lastNodeCount)exitwith {CalculatingRoute = false;[] spawn ServerModules_fnc_GPS_removeMarkers;_returnMessage = "A route could not be found!"; };
     };
     
@@ -282,7 +280,8 @@ ServerModules_fnc_GPS_FindNeighbors =
 
     if (_roadInfo select 8)then 
     {
-        if ( count(nearestObjects [_nodePos, ["Land_RetroRP_Lift_Bridge"], 100]) > 0) then {_radius = 50;}else{_radius = 15;};//_radius = 50;
+        _radius = 15;
+        //if ( count(nearestObjects [_nodePos, ["Land_RetroRP_Lift_Bridge"], 100]) > 0) then {_radius = 50;}else{_radius = 15;};//_radius = 50;
     };
 
     {
@@ -337,8 +336,7 @@ ServerModules_fnc_GPS_FindPath =
 
     // Calls the A* pathfinding function with the provided parameters and stores the result in _return.
     private _return = [_start, _end, _index] call ServerModules_fnc_GPS_AStar;
-    hint _return;
-
+    hint format["%1",_return];
 };
 ServerModules_fnc_GPS_InitClient = 
 {
@@ -391,8 +389,6 @@ ServerModules_fnc_GPS_InitClient =
     // Spawn a background process to create local arrow sign objects at each road node for visualization/debugging
     [] spawn 
     {
-        
-        
         if (isNil "RRP_falseRoads") then {RRP_falseRoads = [];};
         if (isNil "allRoads") then {allRoads = [];};
         {
@@ -469,6 +465,10 @@ ServerModules_fnc_GPS_InitClient =
             };
 
         } forEach allRoads;
+        
+        {
+            hideObject _x;
+        } forEach nearestTerrainObjects [[13307.4,8848.32,0], ["ROAD"], 15, true, true];
 
         // Mark GPS as initialized after all nodes are processed
         GPSInitialized = true;
@@ -581,8 +581,8 @@ ServerModules_fnc_GPS_RetracePath =
     } forEach _path;
     */
 };
-
-[] call ServerModules_fnc_GPS_InitClient;
+//RPP_GPSDebug = true;
+//[] call ServerModules_fnc_GPS_InitClient;
 ServerModules_fnc_createTaxi = 
 {
     params [ ["_start", [0,0,0]], ["_dir", -1], ["_hiddenMode", false]];
@@ -731,15 +731,15 @@ ServerModules_fnc_createTaxiRoute =
     _veh setVariable ["RRP_taxiRoute", _route, true];
     _veh setVariable ["RRP_taxiOnRoute", true, true];
     _veh setVariable ["RRP_hiddenObject", true, true];
-    if !(_veh getVariable ["RRP_taxiLoop", false]) then {[_veh] spawn ServerModules_fnc_taxiLoop;};
+    if !(_veh getVariable ["RRP_taxiRouteLoop", false]) then {[_veh] spawn ServerModules_fnc_taxiRouteLoop;};
     player moveInCargo _veh;
 };
-ServerModules_fnc_taxiLoop = 
+ServerModules_fnc_taxiRouteLoop = 
 {
     params [ ["_veh", objNull] ];
     
     if (isNull _veh) exitwith {};
-    _veh setVariable ["RRP_taxiLoop", true, true];
+    _veh setVariable ["RRP_taxiRouteLoop", true, true];
 
     private _pausePos = getPos _veh;
     private _pauseTime = time;
@@ -767,7 +767,7 @@ ServerModules_fnc_taxiLoop =
         if ((fuel _veh) < 0.1) then { _veh setFuel 1; };
 
         // If no passengers, stop the car
-        if (count crew _veh == 0) then {
+        if (count crew _veh < 2) then {
             doStop driver _veh;
             _veh setVariable ["RRP_taxiOnRoute", false, true];
         };
@@ -777,7 +777,6 @@ ServerModules_fnc_taxiLoop =
             {
                 CurrentPath = CurrentPath - [_x];
                 deleteMarker _x;
-                hint format ["Point removed %1",count CurrentPath];
             };
         } forEach CurrentPath;
 
@@ -794,11 +793,8 @@ ServerModules_fnc_taxiLoop =
         private _dest = getMarkerPos (selectMax CurrentPath);
         [_dest,_veh,1] spawn ServerModules_fnc_createTaxiRoute;
     }else{[] call ServerModules_fnc_GPS_removeMarkers;};
-
-
-    _veh setVariable ["RRP_taxiLoop", false, true];
+    _veh setVariable ["RRP_taxiRouteLoop", false, true];
     _veh setVariable ["RRP_taxiOnRoute", false, true];
-   
 };
 ServerModules_fnc_TaxiDrive = 
 {
@@ -894,16 +890,16 @@ ServerModules_fnc_TaxiDrive =
     //player moveInCargo _veh;
     // Now use setDriveOnPath with both points 
     _newDest = getPosATL ([_dest, 500,RRP_falseRoads] call BIS_fnc_nearestRoad);
-    hint format ["newDest: %1", _newDest];
     _drv doMove _newDest;
 };
 ServerModules_fnc_lockInventory = {};
 ServerModules_fnc_customize_Vehicles = {};
 ServerModules_fnc_ToggleLight = {};
 
-_startPos = [6345.8,7457.09,0];
-[_startPos,90] call ServerModules_fnc_createTaxi;
-[[6403.4,7304.02,0],nearestObject [_startPos,"RetroRP_Monaco"]] spawn ServerModules_fnc_createTaxiRoute;
+/*
+_startPos = [14624.7,11865.9,0];
+[_startPos,270] call ServerModules_fnc_createTaxi;
+[[12630.4,9204.31,0],nearestObject [_startPos,"RetroRP_Monaco"]] spawn ServerModules_fnc_createTaxiRoute;
 
 
 //GPSEnabled = true;
@@ -917,3 +913,63 @@ addMissionEventHandler ["MapSingleClick",
 
 waitUntil {vehicle player != player};
 vehicle player setVariable ["RRP_taxiAutoRestart", true];
+
+
+
+_startPos = getpos player;
+[_startPos,getDir player] call ServerModules_fnc_createTaxi;
+[[12630.4,9204.31,0],vehicle player] spawn ServerModules_fnc_createTaxiRoute;
+*/
+
+
+
+
+[] spawn 
+{
+    private _center1 = [9954.675,9969.12,0];
+    private _center2 = [9893.58,9969.085,0];
+    private _areaSize = [3.855,5.29];
+    private _center = [0,0,0];
+    private _return = false;
+    private _pos = [0,0,0];
+    while {alive player} do 
+    {
+        for "_i" from 0 to 2500 do 
+        {
+            _center = selectRandom [_center1, _center2];
+            _return = false;
+            _pos = [[[_center, 10]], []] call BIS_fnc_randomPos;
+            _return = [_center, [3.86, 5.295], _pos] call BIS_fnc_isInsideArea;
+            if (_return && _center isNotEqualTo [0,0,0] && _pos isNotEqualTo [0,0,0]) exitwith {player setPos _pos;player setDir (random 360);};
+        };
+        sleep 0.5;    
+    };
+};
+[] spawn 
+{
+    private _center1 = [9954.675,9969.12,0];
+    private _center2 = [9893.58,9969.085,0];
+    private _areaSize = [3.855,5.29];
+    private _center = [0,0,0];
+    private _return = false;
+    private _pos = [0,0,0];
+    
+    for "_i" from 0 to 150 do 
+    {
+        for "_i" from 0 to 2500 do 
+        {
+            _center = selectRandom [_center1, _center2];
+            _return = false;
+            _pos = [[[_center, 10]], []] call BIS_fnc_randomPos;
+            _return = [_center, [3.86, 5.295], _pos] call BIS_fnc_isInsideArea;
+            if (_return && _center isNotEqualTo [0,0,0] && _pos isNotEqualTo [0,0,0]) exitwith 
+            {
+                (typeOf player) createUnit [[0,0,0], group player, "myUnit = this",1];
+                myUnit disableAI "ALL";
+                myUnit setPos _pos;
+                myUnit setDir (random 360);
+            };
+        };
+        sleep 0.5;
+    };
+};
