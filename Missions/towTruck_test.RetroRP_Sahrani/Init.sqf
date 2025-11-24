@@ -156,7 +156,7 @@ ServerModules_fnc_attachRelativeMemory = {
 
     // POSITION OFFSET
     private _memModel   = _object1 selectionPosition [_memoryPoint, "memory"];
-    private _childModel = _object1 worldToModel (ASLToAGL getPosASL _object2);
+    private _childModel = _object1 worldToModel (_object2 modelToWorld [0,0,0]);
     private _offset     = _childModel vectorDiff _memModel;
 
     // ORIENTATION OFFSET (ROTATION MATRIX COMPONENTS)
@@ -172,27 +172,54 @@ ServerModules_fnc_attachRelativeMemory = {
 
     // ATTACH
     _object2 attachTo [_object1, _offset, _memoryPoint, true];
+    
+    diag_log format ["memModel:%1",_memModel];
+    diag_log format ["childModel:%1",_childModel];
+    diag_log format ["offset:%1",_offset];
+
+    _object2 setVectorDirAndUp [_childDir, _childUp];
+    //_object2 setVectorDir _childDir;
+    //_object2 setDir _dir;
+};
+//
+
+/*
+ServerModules_fnc_attachRelativeMemory = {
+    params [
+        ["_object1", objNull],
+        ["_object2", objNull],
+        ["_memoryPoint", ""],
+        ["_Debug", false]
+    ];
+
+    // POSITION OFFSET
+    private _memModel   = _object1 selectionPosition [_memoryPoint, "memory"];
+    private _childModel = _object1 worldToModel (ASLToAGL getPosASL _object2);
+    private _offset     = _childModel vectorDiff _memModel;
+
+    // ORIENTATION OFFSET (ROTATION MATRIX COMPONENTS)
+    private _memDirUp   = _object1 selectionVectorDirAndUp [_memoryPoint, "memory"];
+    private _memDir     = _memDirUp select 0;
+    private _memUp      = _memDirUp select 1;
+
+    private _childDir   = vectorWorldToModel _object1 (vectorDir _object2);
+    private _childUp    = vectorWorldToModel _object1 (vectorUp  _object2);
+
+    private _relDir = _childDir vectorDiff _memDir;
+    private _relUp  = _childUp  vectorDiff _memUp;
+
+    // ATTACH
+    _object2 attachTo [_object1, _offset, _memoryPoint, false];
 
     // APPLY ORIENTATION RELATIVE TO MEMORY POINT
     private _finalDir = _memDir vectorAdd _relDir;
     private _finalUp  = _memUp  vectorAdd _relUp;
-    hint format 
-    [
-            "finalUp:%1 memUp:%2 relUp: %3",
-            _finalUp, _memUp, _relUp
-    ];
 
     _object2 setVectorDirAndUp [_finalDir, _finalUp];
-    if (_Debug) then 
-    {
-        hint format [
-            "attachRelativeMemory DEBUG:\nParent: %1\nChild: %2\nMemPoint: %3\nOffset: %4\nDir: %5\nUp: %6",
-            _object1, _object2, _memoryPoint, _offset, _finalDir, _finalUp
-        ];
-    };
 };
-
-
+*/
 
 sleep 1;
-[towTruck1] call ServerModules_fnc_towTruckAutoLoad;
+[towTruck1,car1,"Flatdeck_AttachPoint_Center",true] call ServerModules_fnc_attachRelativeMemory;
+//[towTruck1] call ServerModules_fnc_towTruckAutoLoad;
+//towTruck1 animateSource ["flatdeck_lift", 0];towTruck1 animateSource ["flatdeck_slide", 0];
