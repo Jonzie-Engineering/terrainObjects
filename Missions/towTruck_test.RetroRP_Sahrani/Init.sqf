@@ -160,6 +160,7 @@ ServerModules_fnc_attachRelativeMemory = {
     private _offset     = _childModel vectorDiff _memModel;
 
     // ORIENTATION OFFSET (ROTATION MATRIX COMPONENTS)
+    private _dir = [_object2, _object1] call BIS_fnc_relativeDirTo;
     private _memDirUp   = _object1 selectionVectorDirAndUp [_memoryPoint, "memory"];
     private _memDir     = _memDirUp select 0;
     private _memUp      = _memDirUp select 1;
@@ -177,9 +178,9 @@ ServerModules_fnc_attachRelativeMemory = {
     diag_log format ["childModel:%1",_childModel];
     diag_log format ["offset:%1",_offset];
 
-    _object2 setVectorDirAndUp [_childDir, _childUp];
+    //_object2 setVectorDirAndUp [[0,1,0],[0,0,1]];
     //_object2 setVectorDir _childDir;
-    //_object2 setDir _dir;
+    _object2 setDir _dir;
 };
 //
 
@@ -216,10 +217,11 @@ ServerModules_fnc_attachRelativeMemory = {
     private _finalUp  = _memUp  vectorAdd _relUp;
 
     _object2 setVectorDirAndUp [_finalDir, _finalUp];
+    towtruck1 selectionVectorDirAndUp ["Flatdeck_AttachPoint_Center", "memory"];
 };
 */
 
-sleep 1;
+sleep 3;
 [towTruck1,car1,"Flatdeck_AttachPoint_Center",true] call ServerModules_fnc_attachRelativeMemory;
 //[towTruck1] call ServerModules_fnc_towTruckAutoLoad;
 //towTruck1 animateSource ["flatdeck_lift", 0];towTruck1 animateSource ["flatdeck_slide", 0];
