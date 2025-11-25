@@ -6,6 +6,24 @@ vehicleInit = {
     _truck animateSource ["PTO", 1, true];
     //[_truck,_object] spawn towLoop;
 };
+randomVehicle = {
+    params [["_truck", objNull]];
+    _className = selectRandom ["RetroRP_Monaco","RetroRP_Dart","RetroRP_Charger69","RetroRP_F100","RetroRP_Vandura","RetroRP_288_GTO","RetroRP_CorvetteZR1","RetroRP_Vandura_Ambulance","RetroRP_W900","RetroRP_Dozer","RetroRP_Forklift","RetroRP_Frontend_Loader","RetroRP_Tractor_Old","RetroRP_Defender"]
+    _newCar = createVehicle [_className, ((_truck modelToWorldVisual (_truck selectionPosition ["Flatdeck_AttachPoint_Rear", "memory"])) vectorAdd [0,0,5]), [], 0, "CAN_COLLIDE"];
+    _newCar setDir (random 360);
+    [_truck] call ServerModules_fnc_towTruckAutoLoad; 
+    //[_truck,_object] spawn towLoop;
+};
+towTruckTest = {
+    params [["_truck", objNull], ["_object", objNull]];
+    waitUntil {(_object IN (attachedObjects _truck)) && _truck animationSourcePhase "flatdeck_lift" < 0.1 && _truck animationSourcePhase "flatdeck_slide" < 0.1};
+    sleep 2;
+    _truck animateSource ["flatdeck_lift", 1];
+    _truck animateSource ["flatdeck_slide", 1];
+    waitUntil {(_object IN (attachedObjects _truck)) && _truck animationSourcePhase "flatdeck_lift" > 0.99 && _truck animationSourcePhase "flatdeck_slide" > 0.99};
+    sleep 2;
+    //[_truck,_object] spawn towLoop;
+};
 towLoop = {
     params [["_truck", objNull], ["_object", objNull]];
 
@@ -156,8 +174,9 @@ ServerModules_fnc_attachRelativeMemory = {
 
     // POSITION OFFSET
     private _memModel   = _object1 selectionPosition [_memoryPoint, "memory"];
-    private _childModel = _object1 worldToModel (_object2 modelToWorld [0,0,0]);
+    private _childModel = _object1 worldToModelVisual (_object2 modelToWorldVisual [0,0,0]);
     private _offset     = _childModel vectorDiff _memModel;
+    
 
     // ORIENTATION OFFSET (ROTATION MATRIX COMPONENTS)
     private _dir = [_object2, _object1] call BIS_fnc_relativeDirTo;
@@ -173,6 +192,38 @@ ServerModules_fnc_attachRelativeMemory = {
 
     // ATTACH
     _object2 attachTo [_object1, _offset, _memoryPoint, true];
+    if ( _memDirUp isNotEqualTo [[0,1,0],[0,0,1]] ) then
+    {
+        [_object1,_object2,_memoryPoint,_offset,_dir] spawn 
+        { 
+            params [ ["_object1", objNull], ["_object2", objNull], ["_memoryPoint", ""], ["_offset", [0,0,0]], ["_dir", [0,0,0]] ];
+            waitUntil {_object1 selectionVectorDirAndUp [_memoryPoint, "memory"] isEqualTo [[0,1,0],[0,0,1]]};
+            detach _object2;
+            waitUntil {!(_object2 IN (attachedObjects _object1))};
+            sleep 1;
+            [_object1,_object2,"Flatdeck_AttachPoint_Center",true] call ServerModules_fnc_attachRelativeMemory;
+        };
+        /*
+        _object2 attachTo [_object1, _offset, _memoryPoint, false];
+        [_object1,_object2,_memoryPoint,_offset,_dir] spawn 
+        { 
+            params [ ["_object1", objNull], ["_object2", objNull], ["_memoryPoint", ""], ["_offset", [0,0,0]], ["_dir", [0,0,0]] ];
+            waitUntil {_object2 IN (attachedObjects _object1)};
+            while {_object2 IN (attachedObjects _object1) && _object1 selectionVectorDirAndUp [_memoryPoint, "memory"] isNotEqualTo [[0,1,0],[0,0,1]] } do 
+            {
+                private _memDirUp   = _object1 selectionVectorDirAndUp [_memoryPoint, "memory"];
+                private _memDir     = _memDirUp select 0;
+                private _memUp      = _memDirUp select 1;
+                //_object2 setVectorDirAndUp _memDirUp;
+                _object2 setVectorUp _memUp;
+                //_object2 setDir _dir;
+                sleep 0.05;
+            };
+            if (_object2 IN (attachedObjects _object1) && _object1 selectionVectorDirAndUp [_memoryPoint, "memory"] isEqualTo [[0,1,0],[0,0,1]])then {detach _object2;sleep 0.5;_object2 attachTo [_object1, _offset, _memoryPoint, true];_object2 setDir _dir;};
+        };
+        */
+    };
+    _object2 setDir _dir;
     
     diag_log format ["memModel:%1",_memModel];
     diag_log format ["childModel:%1",_childModel];
@@ -180,7 +231,7 @@ ServerModules_fnc_attachRelativeMemory = {
 
     //_object2 setVectorDirAndUp [[0,1,0],[0,0,1]];
     //_object2 setVectorDir _childDir;
-    _object2 setDir _dir;
+    
 };
 //
 
