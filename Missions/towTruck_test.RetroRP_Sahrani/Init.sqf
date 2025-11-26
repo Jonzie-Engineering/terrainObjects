@@ -4,24 +4,34 @@ vehicleInit = {
     _truck animateSource ["flatdeck_lift", 1, true];
     _truck animateSource ["flatdeck_slide", 1, true];
     _truck animateSource ["PTO", 1, true];
+    [_truck] spawn towTruckTest;
     //[_truck,_object] spawn towLoop;
 };
 randomVehicle = {
     params [["_truck", objNull]];
-    _className = selectRandom ["RetroRP_Monaco","RetroRP_Dart","RetroRP_Charger69","RetroRP_F100","RetroRP_Vandura","RetroRP_288_GTO","RetroRP_CorvetteZR1","RetroRP_Vandura_Ambulance","RetroRP_W900","RetroRP_Dozer","RetroRP_Forklift","RetroRP_Frontend_Loader","RetroRP_Tractor_Old","RetroRP_Defender"]
-    _newCar = createVehicle [_className, ((_truck modelToWorldVisual (_truck selectionPosition ["Flatdeck_AttachPoint_Rear", "memory"])) vectorAdd [0,0,5]), [], 0, "CAN_COLLIDE"];
+    _className = selectRandom ["RetroRP_Mini","RetroRP_Monaco","RetroRP_Dart","RetroRP_Charger69","RetroRP_F100","RetroRP_Vandura","RetroRP_288_GTO","RetroRP_CorvetteZR1","RetroRP_Vandura_Ambulance","RetroRP_W900","RetroRP_Dozer","RetroRP_Forklift","RetroRP_Frontend_Loader","RetroRP_Defender"];
+    _newCar = createVehicle [_className, ((_truck modelToWorldVisual (_truck selectionPosition ["Flatdeck_AttachPoint_Rear", "memory"])) vectorAdd [-0.6,0,2]), [], 0, "CAN_COLLIDE"];
     _newCar setDir (random 360);
-    [_truck] call ServerModules_fnc_towTruckAutoLoad; 
-    //[_truck,_object] spawn towLoop;
+    _newCar
 };
 towTruckTest = {
-    params [["_truck", objNull], ["_object", objNull]];
-    waitUntil {(_object IN (attachedObjects _truck)) && _truck animationSourcePhase "flatdeck_lift" < 0.1 && _truck animationSourcePhase "flatdeck_slide" < 0.1};
+    params [ ["_truck", objNull] ];
+    private _object = objNull;
+    _object = [_truck] call randomVehicle;
+    waitUntil {!(isNull _object)};
+    sleep 2;
+    [_truck] call ServerModules_fnc_towTruckAutoLoad;
+
+    waitUntil {_truck animationSourcePhase "flatdeck_lift" <= 0 && _truck animationSourcePhase "flatdeck_slide" <= 0 || !alive _object};
+    if (isNull _object) exitwith {[_truck] spawn towTruckTest;};
     sleep 2;
     _truck animateSource ["flatdeck_lift", 1];
     _truck animateSource ["flatdeck_slide", 1];
-    waitUntil {(_object IN (attachedObjects _truck)) && _truck animationSourcePhase "flatdeck_lift" > 0.99 && _truck animationSourcePhase "flatdeck_slide" > 0.99};
+    waitUntil {_truck animationSourcePhase "flatdeck_lift" >= 1 && _truck animationSourcePhase "flatdeck_slide" >= 1};
+    detach _object;
     sleep 2;
+    deleteVehicle _object;
+    [_truck] spawn towTruckTest;
     //[_truck,_object] spawn towLoop;
 };
 towLoop = {
@@ -84,7 +94,6 @@ towLoop = {
     ropeUnwind [_rope, 10, 0,true];
     _object disableBrakes false;
 };
-[towTruck1,car1] call vehicleInit;
 ServerModules_fnc_towTruckAutoLoad = {
     params [ ["_truck", objNull] ];
 
@@ -92,7 +101,14 @@ ServerModules_fnc_towTruckAutoLoad = {
     if (_truck animationSourcePhase "flatdeck_body" < 1)exitwith {hint "Flatbed not installed"};
     if (_truck animationSourcePhase "flatdeck_lift" < 1 || _truck animationSourcePhase "flatdeck_slide" < 1)exitwith {hint "Flatbed not on the ground"};
     
+    // Boost system
+    private _boost     = 0;
+    private _boostStep = 0.01;
+    private _boostMax  = 5;
+    private _targetSpeed = 5;// Target speed in m/s (1 kph ≈ 0.27778)
     private _object = objNull;
+    private _exit = false;
+    private _aligned = [];
     private _pos1 = (_truck selectionPosition "Flatdeck_AttachPoint_Rear");
     private _pos2 = _pos1 vectorAdd [0,-1,3];
     private _backPos = _truck modelToWorldWorld _pos1;
@@ -102,16 +118,33 @@ ServerModules_fnc_towTruckAutoLoad = {
     
     private _intersectBack = lineIntersectsObjs [_backPos, _BackPosDir, _truck];
     private _intersectFront = lineIntersectsObjs [_frontPos, _frontPosDir, _truck];
-    if (count _intersectBack < 1) exitwith {hint "No vehicle found"};
-    // Boost system
-    private _boost     = 0;
-    private _boostStep = 0.01;
-    private _boostMax  = 5;
-    private _targetSpeed = 5;// Target speed in m/s (1 kph ≈ 0.27778)
+    if (count _intersectBack < 1) exitwith {hint "No vehicle found";deleteVehicle (nearestObject [_truck, ["RetroRP_Mini","RetroRP_Monaco","RetroRP_Dart","RetroRP_Charger69","RetroRP_F100","RetroRP_Vandura","RetroRP_288_GTO","RetroRP_CorvetteZR1","RetroRP_Vandura_Ambulance","RetroRP_W900","RetroRP_Dozer","RetroRP_Forklift","RetroRP_Frontend_Loader","RetroRP_Defender"]])};
     
-    while {count _intersectFront < 1} do 
     {
-        {
+        // alignment of truck relative to _x (0..360)
+        private _alignment = [_truck, _x] call BIS_fnc_relativeDirTo;
+        hint format ["alignment:%1",_alignment];
+
+        // if truck is not roughly behind _x (outside 160..200) then bail out
+        if (_alignment < 179 || _alignment > 181) exitWith { _exit = true;deleteVehicle _x};
+
+        // alignment of _x relative to truck (0..360)
+        private _alignmentTruck = [_x, _truck] call BIS_fnc_relativeDirTo;
+
+        // if _x is facing roughly the same direction as the truck (within ±20° of 0/360)
+        if ((_alignmentTruck <= 10) || (_alignmentTruck >= 350)) exitWith { _x setDir (getDir _truck);_aligned pushBack _x; };
+        
+        // if _x is facing roughly opposite the truck (within 160..200)
+        if (_alignmentTruck >= 170 && _alignmentTruck <= 190) exitWith { _x setDir (getDir _truck + 180);_aligned pushBack _x; };
+        
+        if (_exit || count _aligned < 1) exitWith {deleteVehicle _x;hint "Vehicle not positioned correctly"};
+
+    } forEach _intersectBack;
+    if (_exit || count _aligned < 1) exitWith {hint "Vehicle not positioned correctly";deleteVehicle (nearestObject [_truck, ["RetroRP_Mini","RetroRP_Monaco","RetroRP_Dart","RetroRP_Charger69","RetroRP_F100","RetroRP_Vandura","RetroRP_288_GTO","RetroRP_CorvetteZR1","RetroRP_Vandura_Ambulance","RetroRP_W900","RetroRP_Dozer","RetroRP_Forklift","RetroRP_Frontend_Loader","RetroRP_Defender"]])};
+    
+    for "_i" from 0 to 1000 do
+	{
+		{
             _object = _x;
             // Ensure brakes are off and physics awake
             if !(brakesDisabled _object) then {_object disableBrakes true;};
@@ -142,35 +175,24 @@ ServerModules_fnc_towTruckAutoLoad = {
         } forEach _intersectBack;
         
         _intersectFront = lineIntersectsObjs [_frontPos, _frontPosDir, _truck];
+        if (count _intersectFront > 0)exitwith{};
         sleep 0.01;
-    };
+	};
+    if (count _intersectFront < 1)exitwith{};
     {
         _x disableBrakes false;
-        [_truck,_x,"Flatdeck_AttachPoint_Center",true] call ServerModules_fnc_attachRelativeMemory;
+        [_truck,_x,"Flatdeck_AttachPoint_Center"] call ServerModules_fnc_attachRelativeMemory;
     } forEach _intersectBack;
     _truck animateSource ["flatdeck_lift", 0];
     _truck animateSource ["flatdeck_slide", 0];
 };
-/*
-    Attach object2 to object1 at memory point using ASL/world orientation
-    Usage:
-    [_object1, _object2, "memoryPointName", true] call ServerModules_fnc_attachRelativeMemory;
-*/
-
-/*
-    Perfect relative attach that:
-    - uses ASL (never underground)
-    - preserves correct dir/up
-    - follows model/bone movement perfectly
-*/
-
 ServerModules_fnc_attachRelativeMemory = {
     params [
         ["_object1", objNull],
         ["_object2", objNull],
-        ["_memoryPoint", ""],
-        ["_Debug", false]
+        ["_memoryPoint", ""]
     ];
+
 
     // POSITION OFFSET
     private _memModel   = _object1 selectionPosition [_memoryPoint, "memory"];
@@ -233,7 +255,16 @@ ServerModules_fnc_attachRelativeMemory = {
     //_object2 setVectorDir _childDir;
     
 };
-//
+
+//[towTruck1] call vehicleInit;
+//[towTruck2] call vehicleInit;
+//[towTruck3] call vehicleInit;
+//[towTruck4] call vehicleInit;
+towTruck1 animateSource ["flatdeck_body", 1, true];
+towTruck1 animateSource ["flatdeck_lift", 1, true];
+towTruck1 animateSource ["flatdeck_slide", 1, true];
+sleep 3;
+[towTruck1,car1,"Flatdeck_AttachPoint_Center"] call ServerModules_fnc_attachRelativeMemory;
 
 /*
 ServerModules_fnc_attachRelativeMemory = {
@@ -272,7 +303,18 @@ ServerModules_fnc_attachRelativeMemory = {
 };
 */
 
-sleep 3;
-[towTruck1,car1,"Flatdeck_AttachPoint_Center",true] call ServerModules_fnc_attachRelativeMemory;
 //[towTruck1] call ServerModules_fnc_towTruckAutoLoad;
 //towTruck1 animateSource ["flatdeck_lift", 0];towTruck1 animateSource ["flatdeck_slide", 0];
+
+/*
+    Attach object2 to object1 at memory point using ASL/world orientation
+    Usage:
+    [_object1, _object2, "memoryPointName", true] call ServerModules_fnc_attachRelativeMemory;
+*/
+
+/*
+    Perfect relative attach that:
+    - uses ASL (never underground)
+    - preserves correct dir/up
+    - follows model/bone movement perfectly
+*/

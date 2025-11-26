@@ -8,14 +8,14 @@ class EditorData
 	toggles=1;
 	class ItemIDProvider
 	{
-		nextID=27;
+		nextID=28;
 	};
 	class Camera
 	{
-		pos[]={9951.9541,156.62773,10016.387};
-		dir[]={0.83586967,-0.44251081,-0.3249284};
-		up[]={0.41247782,0.89674175,-0.16034247};
-		aside[]={-0.3623313,-9.2899427e-08,-0.93208885};
+		pos[]={9980.4395,154.74577,10014.798};
+		dir[]={0.57963306,-0.70883036,-0.40204298};
+		up[]={0.58245951,0.70535749,-0.40400234};
+		aside[]={-0.56995434,1.1204975e-08,-0.8217116};
 	};
 };
 binarizationWanted=0;
@@ -7791,6 +7791,19 @@ class Mission
 			{
 				class Attribute0
 				{
+					property="allowDamage";
+					expression="_this allowdamage _value;";
+					class Value
+					{
+						class data
+						{
+							singleType="BOOL";
+							value=0;
+						};
+					};
+				};
+				class Attribute1
+				{
 					property="VehicleCustomization";
 					expression="if (local _this) then {([_this] + _value + [true]) call (uinamespace getvariable 'BIS_fnc_initVehicle')};";
 					class Value
@@ -9507,27 +9520,10 @@ class Mission
 						};
 					};
 				};
-				nAttributes=1;
+				nAttributes=2;
 			};
 		};
 		class Item18
-		{
-			dataType="Object";
-			class PositionInfo
-			{
-				position[]={9968.333,140.89661,10006.801};
-				angles[]={0,1.5707964,0};
-			};
-			side="Empty";
-			class Attributes
-			{
-				name="car1";
-			};
-			id=18;
-			type="RetroRP_288_GTO";
-			atlOffset=2.0773468;
-		};
-		class Item19
 		{
 			dataType="Group";
 			side="Civilian";
@@ -9539,8 +9535,8 @@ class Mission
 					dataType="Object";
 					class PositionInfo
 					{
-						position[]={9985.2246,138.22144,10009.087};
-						angles[]={0,1.9420612,0};
+						position[]={9991.71,138.22144,10012.665};
+						angles[]={0,2.867955,-0};
 					};
 					side="Civilian";
 					flags=7;
@@ -9557,7 +9553,7 @@ class Mission
 			};
 			id=19;
 		};
-		class Item20
+		class Item19
 		{
 			dataType="Object";
 			class PositionInfo
@@ -11280,7 +11276,7 @@ class Mission
 				nAttributes=1;
 			};
 		};
-		class Item21
+		class Item20
 		{
 			dataType="Object";
 			class PositionInfo
@@ -11301,6 +11297,19 @@ class Mission
 			{
 				class Attribute0
 				{
+					property="allowDamage";
+					expression="_this allowdamage _value;";
+					class Value
+					{
+						class data
+						{
+							singleType="BOOL";
+							value=0;
+						};
+					};
+				};
+				class Attribute1
+				{
 					property="VehicleCustomization";
 					expression="if (local _this) then {([_this] + _value + [true]) call (uinamespace getvariable 'BIS_fnc_initVehicle')};";
 					class Value
@@ -13017,10 +13026,10 @@ class Mission
 						};
 					};
 				};
-				nAttributes=1;
+				nAttributes=2;
 			};
 		};
-		class Item22
+		class Item21
 		{
 			dataType="Object";
 			class PositionInfo
@@ -13037,7 +13046,7 @@ class Mission
 			id=23;
 			type="RetroRP_288_GTO";
 		};
-		class Item23
+		class Item22
 		{
 			dataType="Object";
 			class PositionInfo
@@ -13058,1745 +13067,18 @@ class Mission
 			{
 				class Attribute0
 				{
-					property="VehicleCustomization";
-					expression="if (local _this) then {([_this] + _value + [true]) call (uinamespace getvariable 'BIS_fnc_initVehicle')};";
+					property="allowDamage";
+					expression="_this allowdamage _value;";
 					class Value
 					{
 						class data
 						{
-							singleType="ARRAY";
-							class value
-							{
-								items=2;
-								class Item0
-								{
-									class data
-									{
-										singleType="ARRAY";
-										class value
-										{
-											items=2;
-											class Item0
-											{
-												class data
-												{
-													singleType="STRING";
-													value="Holden_Gravel";
-												};
-											};
-											class Item1
-											{
-												class data
-												{
-													singleType="SCALAR";
-													value=1;
-												};
-											};
-										};
-									};
-								};
-								class Item1
-								{
-									class data
-									{
-										singleType="ARRAY";
-										class value
-										{
-											items=208;
-											class Item0
-											{
-												class data
-												{
-													singleType="STRING";
-													value="Tipper_Body";
-												};
-											};
-											class Item1
-											{
-												class data
-												{
-													singleType="SCALAR";
-													value=0;
-												};
-											};
-											class Item2
-											{
-												class data
-												{
-													singleType="STRING";
-													value="Flatdeck_Body";
-												};
-											};
-											class Item3
-											{
-												class data
-												{
-													singleType="SCALAR";
-													value=1;
-												};
-											};
-											class Item4
-											{
-												class data
-												{
-													singleType="STRING";
-													value="Floodlights_Addon";
-												};
-											};
-											class Item5
-											{
-												class data
-												{
-													singleType="SCALAR";
-													value=0;
-												};
-											};
-											class Item6
-											{
-												class data
-												{
-													singleType="STRING";
-													value="Beacon";
-												};
-											};
-											class Item7
-											{
-												class data
-												{
-													singleType="SCALAR";
-													value=0;
-												};
-											};
-											class Item8
-											{
-												class data
-												{
-													singleType="STRING";
-													value="Mods";
-												};
-											};
-											class Item9
-											{
-												class data
-												{
-													singleType="SCALAR";
-													value=0;
-												};
-											};
-											class Item10
-											{
-												class data
-												{
-													singleType="STRING";
-													value="Stock_Bonnet";
-												};
-											};
-											class Item11
-											{
-												class data
-												{
-													singleType="SCALAR";
-													value=0;
-												};
-											};
-											class Item12
-											{
-												class data
-												{
-													singleType="STRING";
-													value="Stock_Front_Bumper";
-												};
-											};
-											class Item13
-											{
-												class data
-												{
-													singleType="SCALAR";
-													value=0;
-												};
-											};
-											class Item14
-											{
-												class data
-												{
-													singleType="STRING";
-													value="Stock_Rear_Bumper";
-												};
-											};
-											class Item15
-											{
-												class data
-												{
-													singleType="SCALAR";
-													value=0;
-												};
-											};
-											class Item16
-											{
-												class data
-												{
-													singleType="STRING";
-													value="Stock_Exhaust";
-												};
-											};
-											class Item17
-											{
-												class data
-												{
-													singleType="SCALAR";
-													value=0;
-												};
-											};
-											class Item18
-											{
-												class data
-												{
-													singleType="STRING";
-													value="Stock_Side_Skirt";
-												};
-											};
-											class Item19
-											{
-												class data
-												{
-													singleType="SCALAR";
-													value=0;
-												};
-											};
-											class Item20
-											{
-												class data
-												{
-													singleType="STRING";
-													value="Stock_Spoiler";
-												};
-											};
-											class Item21
-											{
-												class data
-												{
-													singleType="SCALAR";
-													value=0;
-												};
-											};
-											class Item22
-											{
-												class data
-												{
-													singleType="STRING";
-													value="Towbar_Addon";
-												};
-											};
-											class Item23
-											{
-												class data
-												{
-													singleType="SCALAR";
-													value=0;
-												};
-											};
-											class Item24
-											{
-												class data
-												{
-													singleType="STRING";
-													value="Roll_Cage";
-												};
-											};
-											class Item25
-											{
-												class data
-												{
-													singleType="SCALAR";
-													value=0;
-												};
-											};
-											class Item26
-											{
-												class data
-												{
-													singleType="STRING";
-													value="Rim_mods";
-												};
-											};
-											class Item27
-											{
-												class data
-												{
-													singleType="SCALAR";
-													value=0;
-												};
-											};
-											class Item28
-											{
-												class data
-												{
-													singleType="STRING";
-													value="Stock_Wheels";
-												};
-											};
-											class Item29
-											{
-												class data
-												{
-													singleType="SCALAR";
-													value=0;
-												};
-											};
-											class Item30
-											{
-												class data
-												{
-													singleType="STRING";
-													value="Antenna";
-												};
-											};
-											class Item31
-											{
-												class data
-												{
-													singleType="SCALAR";
-													value=0;
-												};
-											};
-											class Item32
-											{
-												class data
-												{
-													singleType="STRING";
-													value="Police";
-												};
-											};
-											class Item33
-											{
-												class data
-												{
-													singleType="SCALAR";
-													value=0;
-												};
-											};
-											class Item34
-											{
-												class data
-												{
-													singleType="STRING";
-													value="Push_Bar";
-												};
-											};
-											class Item35
-											{
-												class data
-												{
-													singleType="SCALAR";
-													value=0;
-												};
-											};
-											class Item36
-											{
-												class data
-												{
-													singleType="STRING";
-													value="Radio";
-												};
-											};
-											class Item37
-											{
-												class data
-												{
-													singleType="SCALAR";
-													value=0;
-												};
-											};
-											class Item38
-											{
-												class data
-												{
-													singleType="STRING";
-													value="PoliceComputer";
-												};
-											};
-											class Item39
-											{
-												class data
-												{
-													singleType="SCALAR";
-													value=0;
-												};
-											};
-											class Item40
-											{
-												class data
-												{
-													singleType="STRING";
-													value="HandSpotlight";
-												};
-											};
-											class Item41
-											{
-												class data
-												{
-													singleType="SCALAR";
-													value=0;
-												};
-											};
-											class Item42
-											{
-												class data
-												{
-													singleType="STRING";
-													value="Radar";
-												};
-											};
-											class Item43
-											{
-												class data
-												{
-													singleType="SCALAR";
-													value=0;
-												};
-											};
-											class Item44
-											{
-												class data
-												{
-													singleType="STRING";
-													value="RoadCone";
-												};
-											};
-											class Item45
-											{
-												class data
-												{
-													singleType="SCALAR";
-													value=0;
-												};
-											};
-											class Item46
-											{
-												class data
-												{
-													singleType="STRING";
-													value="RoadFlares";
-												};
-											};
-											class Item47
-											{
-												class data
-												{
-													singleType="SCALAR";
-													value=0;
-												};
-											};
-											class Item48
-											{
-												class data
-												{
-													singleType="STRING";
-													value="Shotgun";
-												};
-											};
-											class Item49
-											{
-												class data
-												{
-													singleType="SCALAR";
-													value=0;
-												};
-											};
-											class Item50
-											{
-												class data
-												{
-													singleType="STRING";
-													value="Lightbar_BEACON_17";
-												};
-											};
-											class Item51
-											{
-												class data
-												{
-													singleType="SCALAR";
-													value=0;
-												};
-											};
-											class Item52
-											{
-												class data
-												{
-													singleType="STRING";
-													value="Lightbar_Can";
-												};
-											};
-											class Item53
-											{
-												class data
-												{
-													singleType="SCALAR";
-													value=0;
-												};
-											};
-											class Item54
-											{
-												class data
-												{
-													singleType="STRING";
-													value="Lightbar_Can_Amber";
-												};
-											};
-											class Item55
-											{
-												class data
-												{
-													singleType="SCALAR";
-													value=0;
-												};
-											};
-											class Item56
-											{
-												class data
-												{
-													singleType="STRING";
-													value="Lightbar_Can_Red";
-												};
-											};
-											class Item57
-											{
-												class data
-												{
-													singleType="SCALAR";
-													value=0;
-												};
-											};
-											class Item58
-											{
-												class data
-												{
-													singleType="STRING";
-													value="Lightbar_CJ_184";
-												};
-											};
-											class Item59
-											{
-												class data
-												{
-													singleType="SCALAR";
-													value=0;
-												};
-											};
-											class Item60
-											{
-												class data
-												{
-													singleType="STRING";
-													value="Lightbar_mars_skybolt";
-												};
-											};
-											class Item61
-											{
-												class data
-												{
-													singleType="SCALAR";
-													value=0;
-												};
-											};
-											class Item62
-											{
-												class data
-												{
-													singleType="STRING";
-													value="Lightbar_twin_sonic_chp";
-												};
-											};
-											class Item63
-											{
-												class data
-												{
-													singleType="SCALAR";
-													value=0;
-												};
-											};
-											class Item64
-											{
-												class data
-												{
-													singleType="STRING";
-													value="Lightbar_Fireball";
-												};
-											};
-											class Item65
-											{
-												class data
-												{
-													singleType="SCALAR";
-													value=0;
-												};
-											};
-											class Item66
-											{
-												class data
-												{
-													singleType="STRING";
-													value="Lightbar_Aerodynic";
-												};
-											};
-											class Item67
-											{
-												class data
-												{
-													singleType="SCALAR";
-													value=0;
-												};
-											};
-											class Item68
-											{
-												class data
-												{
-													singleType="STRING";
-													value="WheelAddon1";
-												};
-											};
-											class Item69
-											{
-												class data
-												{
-													singleType="SCALAR";
-													value=0;
-												};
-											};
-											class Item70
-											{
-												class data
-												{
-													singleType="STRING";
-													value="WheelAddon2";
-												};
-											};
-											class Item71
-											{
-												class data
-												{
-													singleType="SCALAR";
-													value=0;
-												};
-											};
-											class Item72
-											{
-												class data
-												{
-													singleType="STRING";
-													value="WheelAddon3";
-												};
-											};
-											class Item73
-											{
-												class data
-												{
-													singleType="SCALAR";
-													value=0;
-												};
-											};
-											class Item74
-											{
-												class data
-												{
-													singleType="STRING";
-													value="WheelAddon4";
-												};
-											};
-											class Item75
-											{
-												class data
-												{
-													singleType="SCALAR";
-													value=0;
-												};
-											};
-											class Item76
-											{
-												class data
-												{
-													singleType="STRING";
-													value="WheelAddon5";
-												};
-											};
-											class Item77
-											{
-												class data
-												{
-													singleType="SCALAR";
-													value=0;
-												};
-											};
-											class Item78
-											{
-												class data
-												{
-													singleType="STRING";
-													value="WheelAddon6";
-												};
-											};
-											class Item79
-											{
-												class data
-												{
-													singleType="SCALAR";
-													value=0;
-												};
-											};
-											class Item80
-											{
-												class data
-												{
-													singleType="STRING";
-													value="WheelAddon7";
-												};
-											};
-											class Item81
-											{
-												class data
-												{
-													singleType="SCALAR";
-													value=0;
-												};
-											};
-											class Item82
-											{
-												class data
-												{
-													singleType="STRING";
-													value="WheelAddon8";
-												};
-											};
-											class Item83
-											{
-												class data
-												{
-													singleType="SCALAR";
-													value=0;
-												};
-											};
-											class Item84
-											{
-												class data
-												{
-													singleType="STRING";
-													value="WheelAddon9";
-												};
-											};
-											class Item85
-											{
-												class data
-												{
-													singleType="SCALAR";
-													value=0;
-												};
-											};
-											class Item86
-											{
-												class data
-												{
-													singleType="STRING";
-													value="WheelAddon10";
-												};
-											};
-											class Item87
-											{
-												class data
-												{
-													singleType="SCALAR";
-													value=0;
-												};
-											};
-											class Item88
-											{
-												class data
-												{
-													singleType="STRING";
-													value="WheelAddon11";
-												};
-											};
-											class Item89
-											{
-												class data
-												{
-													singleType="SCALAR";
-													value=0;
-												};
-											};
-											class Item90
-											{
-												class data
-												{
-													singleType="STRING";
-													value="WheelAddon12";
-												};
-											};
-											class Item91
-											{
-												class data
-												{
-													singleType="SCALAR";
-													value=0;
-												};
-											};
-											class Item92
-											{
-												class data
-												{
-													singleType="STRING";
-													value="WheelAddon13";
-												};
-											};
-											class Item93
-											{
-												class data
-												{
-													singleType="SCALAR";
-													value=0;
-												};
-											};
-											class Item94
-											{
-												class data
-												{
-													singleType="STRING";
-													value="WheelAddon14";
-												};
-											};
-											class Item95
-											{
-												class data
-												{
-													singleType="SCALAR";
-													value=0;
-												};
-											};
-											class Item96
-											{
-												class data
-												{
-													singleType="STRING";
-													value="WheelAddon15";
-												};
-											};
-											class Item97
-											{
-												class data
-												{
-													singleType="SCALAR";
-													value=0;
-												};
-											};
-											class Item98
-											{
-												class data
-												{
-													singleType="STRING";
-													value="WheelAddon16";
-												};
-											};
-											class Item99
-											{
-												class data
-												{
-													singleType="SCALAR";
-													value=0;
-												};
-											};
-											class Item100
-											{
-												class data
-												{
-													singleType="STRING";
-													value="WheelAddon17";
-												};
-											};
-											class Item101
-											{
-												class data
-												{
-													singleType="SCALAR";
-													value=0;
-												};
-											};
-											class Item102
-											{
-												class data
-												{
-													singleType="STRING";
-													value="WheelAddon18";
-												};
-											};
-											class Item103
-											{
-												class data
-												{
-													singleType="SCALAR";
-													value=0;
-												};
-											};
-											class Item104
-											{
-												class data
-												{
-													singleType="STRING";
-													value="WheelAddon19";
-												};
-											};
-											class Item105
-											{
-												class data
-												{
-													singleType="SCALAR";
-													value=0;
-												};
-											};
-											class Item106
-											{
-												class data
-												{
-													singleType="STRING";
-													value="WheelAddon20";
-												};
-											};
-											class Item107
-											{
-												class data
-												{
-													singleType="SCALAR";
-													value=0;
-												};
-											};
-											class Item108
-											{
-												class data
-												{
-													singleType="STRING";
-													value="WheelAddon21";
-												};
-											};
-											class Item109
-											{
-												class data
-												{
-													singleType="SCALAR";
-													value=0;
-												};
-											};
-											class Item110
-											{
-												class data
-												{
-													singleType="STRING";
-													value="WheelAddon22";
-												};
-											};
-											class Item111
-											{
-												class data
-												{
-													singleType="SCALAR";
-													value=0;
-												};
-											};
-											class Item112
-											{
-												class data
-												{
-													singleType="STRING";
-													value="WheelAddon23";
-												};
-											};
-											class Item113
-											{
-												class data
-												{
-													singleType="SCALAR";
-													value=0;
-												};
-											};
-											class Item114
-											{
-												class data
-												{
-													singleType="STRING";
-													value="WheelAddon24";
-												};
-											};
-											class Item115
-											{
-												class data
-												{
-													singleType="SCALAR";
-													value=0;
-												};
-											};
-											class Item116
-											{
-												class data
-												{
-													singleType="STRING";
-													value="WheelAddon25";
-												};
-											};
-											class Item117
-											{
-												class data
-												{
-													singleType="SCALAR";
-													value=0;
-												};
-											};
-											class Item118
-											{
-												class data
-												{
-													singleType="STRING";
-													value="WheelAddon26";
-												};
-											};
-											class Item119
-											{
-												class data
-												{
-													singleType="SCALAR";
-													value=0;
-												};
-											};
-											class Item120
-											{
-												class data
-												{
-													singleType="STRING";
-													value="WheelAddon27";
-												};
-											};
-											class Item121
-											{
-												class data
-												{
-													singleType="SCALAR";
-													value=0;
-												};
-											};
-											class Item122
-											{
-												class data
-												{
-													singleType="STRING";
-													value="WheelAddon28";
-												};
-											};
-											class Item123
-											{
-												class data
-												{
-													singleType="SCALAR";
-													value=0;
-												};
-											};
-											class Item124
-											{
-												class data
-												{
-													singleType="STRING";
-													value="WheelAddon29";
-												};
-											};
-											class Item125
-											{
-												class data
-												{
-													singleType="SCALAR";
-													value=0;
-												};
-											};
-											class Item126
-											{
-												class data
-												{
-													singleType="STRING";
-													value="WheelAddon30";
-												};
-											};
-											class Item127
-											{
-												class data
-												{
-													singleType="SCALAR";
-													value=0;
-												};
-											};
-											class Item128
-											{
-												class data
-												{
-													singleType="STRING";
-													value="WheelAddon31";
-												};
-											};
-											class Item129
-											{
-												class data
-												{
-													singleType="SCALAR";
-													value=0;
-												};
-											};
-											class Item130
-											{
-												class data
-												{
-													singleType="STRING";
-													value="WheelAddon32";
-												};
-											};
-											class Item131
-											{
-												class data
-												{
-													singleType="SCALAR";
-													value=0;
-												};
-											};
-											class Item132
-											{
-												class data
-												{
-													singleType="STRING";
-													value="WheelAddon33";
-												};
-											};
-											class Item133
-											{
-												class data
-												{
-													singleType="SCALAR";
-													value=0;
-												};
-											};
-											class Item134
-											{
-												class data
-												{
-													singleType="STRING";
-													value="WheelAddon34";
-												};
-											};
-											class Item135
-											{
-												class data
-												{
-													singleType="SCALAR";
-													value=0;
-												};
-											};
-											class Item136
-											{
-												class data
-												{
-													singleType="STRING";
-													value="WheelAddon35";
-												};
-											};
-											class Item137
-											{
-												class data
-												{
-													singleType="SCALAR";
-													value=0;
-												};
-											};
-											class Item138
-											{
-												class data
-												{
-													singleType="STRING";
-													value="WheelAddon36";
-												};
-											};
-											class Item139
-											{
-												class data
-												{
-													singleType="SCALAR";
-													value=0;
-												};
-											};
-											class Item140
-											{
-												class data
-												{
-													singleType="STRING";
-													value="WheelAddon37";
-												};
-											};
-											class Item141
-											{
-												class data
-												{
-													singleType="SCALAR";
-													value=0;
-												};
-											};
-											class Item142
-											{
-												class data
-												{
-													singleType="STRING";
-													value="WheelAddon38";
-												};
-											};
-											class Item143
-											{
-												class data
-												{
-													singleType="SCALAR";
-													value=0;
-												};
-											};
-											class Item144
-											{
-												class data
-												{
-													singleType="STRING";
-													value="WheelAddon39";
-												};
-											};
-											class Item145
-											{
-												class data
-												{
-													singleType="SCALAR";
-													value=0;
-												};
-											};
-											class Item146
-											{
-												class data
-												{
-													singleType="STRING";
-													value="WheelAddon40";
-												};
-											};
-											class Item147
-											{
-												class data
-												{
-													singleType="SCALAR";
-													value=0;
-												};
-											};
-											class Item148
-											{
-												class data
-												{
-													singleType="STRING";
-													value="WheelAddon41";
-												};
-											};
-											class Item149
-											{
-												class data
-												{
-													singleType="SCALAR";
-													value=0;
-												};
-											};
-											class Item150
-											{
-												class data
-												{
-													singleType="STRING";
-													value="WheelAddon42";
-												};
-											};
-											class Item151
-											{
-												class data
-												{
-													singleType="SCALAR";
-													value=0;
-												};
-											};
-											class Item152
-											{
-												class data
-												{
-													singleType="STRING";
-													value="WheelAddon43";
-												};
-											};
-											class Item153
-											{
-												class data
-												{
-													singleType="SCALAR";
-													value=0;
-												};
-											};
-											class Item154
-											{
-												class data
-												{
-													singleType="STRING";
-													value="WheelAddon44";
-												};
-											};
-											class Item155
-											{
-												class data
-												{
-													singleType="SCALAR";
-													value=0;
-												};
-											};
-											class Item156
-											{
-												class data
-												{
-													singleType="STRING";
-													value="WheelAddon45";
-												};
-											};
-											class Item157
-											{
-												class data
-												{
-													singleType="SCALAR";
-													value=0;
-												};
-											};
-											class Item158
-											{
-												class data
-												{
-													singleType="STRING";
-													value="WheelAddon46";
-												};
-											};
-											class Item159
-											{
-												class data
-												{
-													singleType="SCALAR";
-													value=0;
-												};
-											};
-											class Item160
-											{
-												class data
-												{
-													singleType="STRING";
-													value="WheelAddon47";
-												};
-											};
-											class Item161
-											{
-												class data
-												{
-													singleType="SCALAR";
-													value=0;
-												};
-											};
-											class Item162
-											{
-												class data
-												{
-													singleType="STRING";
-													value="WheelAddon48";
-												};
-											};
-											class Item163
-											{
-												class data
-												{
-													singleType="SCALAR";
-													value=0;
-												};
-											};
-											class Item164
-											{
-												class data
-												{
-													singleType="STRING";
-													value="WheelAddon49";
-												};
-											};
-											class Item165
-											{
-												class data
-												{
-													singleType="SCALAR";
-													value=0;
-												};
-											};
-											class Item166
-											{
-												class data
-												{
-													singleType="STRING";
-													value="WheelAddon50";
-												};
-											};
-											class Item167
-											{
-												class data
-												{
-													singleType="SCALAR";
-													value=0;
-												};
-											};
-											class Item168
-											{
-												class data
-												{
-													singleType="STRING";
-													value="WheelAddon51";
-												};
-											};
-											class Item169
-											{
-												class data
-												{
-													singleType="SCALAR";
-													value=0;
-												};
-											};
-											class Item170
-											{
-												class data
-												{
-													singleType="STRING";
-													value="WheelAddon52";
-												};
-											};
-											class Item171
-											{
-												class data
-												{
-													singleType="SCALAR";
-													value=0;
-												};
-											};
-											class Item172
-											{
-												class data
-												{
-													singleType="STRING";
-													value="WheelAddon53";
-												};
-											};
-											class Item173
-											{
-												class data
-												{
-													singleType="SCALAR";
-													value=0;
-												};
-											};
-											class Item174
-											{
-												class data
-												{
-													singleType="STRING";
-													value="WheelAddon54";
-												};
-											};
-											class Item175
-											{
-												class data
-												{
-													singleType="SCALAR";
-													value=0;
-												};
-											};
-											class Item176
-											{
-												class data
-												{
-													singleType="STRING";
-													value="WheelAddon55";
-												};
-											};
-											class Item177
-											{
-												class data
-												{
-													singleType="SCALAR";
-													value=0;
-												};
-											};
-											class Item178
-											{
-												class data
-												{
-													singleType="STRING";
-													value="WheelAddon56";
-												};
-											};
-											class Item179
-											{
-												class data
-												{
-													singleType="SCALAR";
-													value=0;
-												};
-											};
-											class Item180
-											{
-												class data
-												{
-													singleType="STRING";
-													value="WheelAddon57";
-												};
-											};
-											class Item181
-											{
-												class data
-												{
-													singleType="SCALAR";
-													value=0;
-												};
-											};
-											class Item182
-											{
-												class data
-												{
-													singleType="STRING";
-													value="WheelAddon58";
-												};
-											};
-											class Item183
-											{
-												class data
-												{
-													singleType="SCALAR";
-													value=0;
-												};
-											};
-											class Item184
-											{
-												class data
-												{
-													singleType="STRING";
-													value="WheelAddon59";
-												};
-											};
-											class Item185
-											{
-												class data
-												{
-													singleType="SCALAR";
-													value=0;
-												};
-											};
-											class Item186
-											{
-												class data
-												{
-													singleType="STRING";
-													value="WheelAddon60";
-												};
-											};
-											class Item187
-											{
-												class data
-												{
-													singleType="SCALAR";
-													value=0;
-												};
-											};
-											class Item188
-											{
-												class data
-												{
-													singleType="STRING";
-													value="WheelAddon61";
-												};
-											};
-											class Item189
-											{
-												class data
-												{
-													singleType="SCALAR";
-													value=0;
-												};
-											};
-											class Item190
-											{
-												class data
-												{
-													singleType="STRING";
-													value="WheelAddon62";
-												};
-											};
-											class Item191
-											{
-												class data
-												{
-													singleType="SCALAR";
-													value=0;
-												};
-											};
-											class Item192
-											{
-												class data
-												{
-													singleType="STRING";
-													value="WheelAddon63";
-												};
-											};
-											class Item193
-											{
-												class data
-												{
-													singleType="SCALAR";
-													value=0;
-												};
-											};
-											class Item194
-											{
-												class data
-												{
-													singleType="STRING";
-													value="WheelAddon64";
-												};
-											};
-											class Item195
-											{
-												class data
-												{
-													singleType="SCALAR";
-													value=0;
-												};
-											};
-											class Item196
-											{
-												class data
-												{
-													singleType="STRING";
-													value="WheelAddon65";
-												};
-											};
-											class Item197
-											{
-												class data
-												{
-													singleType="SCALAR";
-													value=0;
-												};
-											};
-											class Item198
-											{
-												class data
-												{
-													singleType="STRING";
-													value="WheelAddon66";
-												};
-											};
-											class Item199
-											{
-												class data
-												{
-													singleType="SCALAR";
-													value=0;
-												};
-											};
-											class Item200
-											{
-												class data
-												{
-													singleType="STRING";
-													value="WheelAddon67";
-												};
-											};
-											class Item201
-											{
-												class data
-												{
-													singleType="SCALAR";
-													value=0;
-												};
-											};
-											class Item202
-											{
-												class data
-												{
-													singleType="STRING";
-													value="WheelAddon68";
-												};
-											};
-											class Item203
-											{
-												class data
-												{
-													singleType="SCALAR";
-													value=0;
-												};
-											};
-											class Item204
-											{
-												class data
-												{
-													singleType="STRING";
-													value="WheelAddon69";
-												};
-											};
-											class Item205
-											{
-												class data
-												{
-													singleType="SCALAR";
-													value=0;
-												};
-											};
-											class Item206
-											{
-												class data
-												{
-													singleType="STRING";
-													value="WheelAddon70";
-												};
-											};
-											class Item207
-											{
-												class data
-												{
-													singleType="SCALAR";
-													value=0;
-												};
-											};
-										};
-									};
-								};
-							};
+							singleType="BOOL";
+							value=0;
 						};
 					};
 				};
-				nAttributes=1;
-			};
-		};
-		class Item24
-		{
-			dataType="Object";
-			class PositionInfo
-			{
-				position[]={9998.209,140.77873,10036.731};
-				angles[]={0,1.5707964,0};
-			};
-			side="Empty";
-			flags=4;
-			class Attributes
-			{
-				name="towTruck4";
-				textures="Holden_Gravel";
-			};
-			id=25;
-			type="RetroRP_Mack_RD690";
-			class CustomAttributes
-			{
-				class Attribute0
+				class Attribute1
 				{
 					property="VehicleCustomization";
 					expression="if (local _this) then {([_this] + _value + [true]) call (uinamespace getvariable 'BIS_fnc_initVehicle')};";
@@ -16514,10 +14796,1763 @@ class Mission
 						};
 					};
 				};
-				nAttributes=1;
+				nAttributes=2;
 			};
 		};
-		class Item25
+		class Item23
+		{
+			dataType="Object";
+			class PositionInfo
+			{
+				position[]={9998.209,140.77873,10036.731};
+				angles[]={0,1.5707964,0};
+			};
+			side="Empty";
+			flags=4;
+			class Attributes
+			{
+				name="towTruck4";
+				textures="Holden_Gravel";
+			};
+			id=25;
+			type="RetroRP_Mack_RD690";
+			class CustomAttributes
+			{
+				class Attribute0
+				{
+					property="allowDamage";
+					expression="_this allowdamage _value;";
+					class Value
+					{
+						class data
+						{
+							singleType="BOOL";
+							value=0;
+						};
+					};
+				};
+				class Attribute1
+				{
+					property="VehicleCustomization";
+					expression="if (local _this) then {([_this] + _value + [true]) call (uinamespace getvariable 'BIS_fnc_initVehicle')};";
+					class Value
+					{
+						class data
+						{
+							singleType="ARRAY";
+							class value
+							{
+								items=2;
+								class Item0
+								{
+									class data
+									{
+										singleType="ARRAY";
+										class value
+										{
+											items=2;
+											class Item0
+											{
+												class data
+												{
+													singleType="STRING";
+													value="Holden_Gravel";
+												};
+											};
+											class Item1
+											{
+												class data
+												{
+													singleType="SCALAR";
+													value=1;
+												};
+											};
+										};
+									};
+								};
+								class Item1
+								{
+									class data
+									{
+										singleType="ARRAY";
+										class value
+										{
+											items=208;
+											class Item0
+											{
+												class data
+												{
+													singleType="STRING";
+													value="Tipper_Body";
+												};
+											};
+											class Item1
+											{
+												class data
+												{
+													singleType="SCALAR";
+													value=0;
+												};
+											};
+											class Item2
+											{
+												class data
+												{
+													singleType="STRING";
+													value="Flatdeck_Body";
+												};
+											};
+											class Item3
+											{
+												class data
+												{
+													singleType="SCALAR";
+													value=1;
+												};
+											};
+											class Item4
+											{
+												class data
+												{
+													singleType="STRING";
+													value="Floodlights_Addon";
+												};
+											};
+											class Item5
+											{
+												class data
+												{
+													singleType="SCALAR";
+													value=0;
+												};
+											};
+											class Item6
+											{
+												class data
+												{
+													singleType="STRING";
+													value="Beacon";
+												};
+											};
+											class Item7
+											{
+												class data
+												{
+													singleType="SCALAR";
+													value=0;
+												};
+											};
+											class Item8
+											{
+												class data
+												{
+													singleType="STRING";
+													value="Mods";
+												};
+											};
+											class Item9
+											{
+												class data
+												{
+													singleType="SCALAR";
+													value=0;
+												};
+											};
+											class Item10
+											{
+												class data
+												{
+													singleType="STRING";
+													value="Stock_Bonnet";
+												};
+											};
+											class Item11
+											{
+												class data
+												{
+													singleType="SCALAR";
+													value=0;
+												};
+											};
+											class Item12
+											{
+												class data
+												{
+													singleType="STRING";
+													value="Stock_Front_Bumper";
+												};
+											};
+											class Item13
+											{
+												class data
+												{
+													singleType="SCALAR";
+													value=0;
+												};
+											};
+											class Item14
+											{
+												class data
+												{
+													singleType="STRING";
+													value="Stock_Rear_Bumper";
+												};
+											};
+											class Item15
+											{
+												class data
+												{
+													singleType="SCALAR";
+													value=0;
+												};
+											};
+											class Item16
+											{
+												class data
+												{
+													singleType="STRING";
+													value="Stock_Exhaust";
+												};
+											};
+											class Item17
+											{
+												class data
+												{
+													singleType="SCALAR";
+													value=0;
+												};
+											};
+											class Item18
+											{
+												class data
+												{
+													singleType="STRING";
+													value="Stock_Side_Skirt";
+												};
+											};
+											class Item19
+											{
+												class data
+												{
+													singleType="SCALAR";
+													value=0;
+												};
+											};
+											class Item20
+											{
+												class data
+												{
+													singleType="STRING";
+													value="Stock_Spoiler";
+												};
+											};
+											class Item21
+											{
+												class data
+												{
+													singleType="SCALAR";
+													value=0;
+												};
+											};
+											class Item22
+											{
+												class data
+												{
+													singleType="STRING";
+													value="Towbar_Addon";
+												};
+											};
+											class Item23
+											{
+												class data
+												{
+													singleType="SCALAR";
+													value=0;
+												};
+											};
+											class Item24
+											{
+												class data
+												{
+													singleType="STRING";
+													value="Roll_Cage";
+												};
+											};
+											class Item25
+											{
+												class data
+												{
+													singleType="SCALAR";
+													value=0;
+												};
+											};
+											class Item26
+											{
+												class data
+												{
+													singleType="STRING";
+													value="Rim_mods";
+												};
+											};
+											class Item27
+											{
+												class data
+												{
+													singleType="SCALAR";
+													value=0;
+												};
+											};
+											class Item28
+											{
+												class data
+												{
+													singleType="STRING";
+													value="Stock_Wheels";
+												};
+											};
+											class Item29
+											{
+												class data
+												{
+													singleType="SCALAR";
+													value=0;
+												};
+											};
+											class Item30
+											{
+												class data
+												{
+													singleType="STRING";
+													value="Antenna";
+												};
+											};
+											class Item31
+											{
+												class data
+												{
+													singleType="SCALAR";
+													value=0;
+												};
+											};
+											class Item32
+											{
+												class data
+												{
+													singleType="STRING";
+													value="Police";
+												};
+											};
+											class Item33
+											{
+												class data
+												{
+													singleType="SCALAR";
+													value=0;
+												};
+											};
+											class Item34
+											{
+												class data
+												{
+													singleType="STRING";
+													value="Push_Bar";
+												};
+											};
+											class Item35
+											{
+												class data
+												{
+													singleType="SCALAR";
+													value=0;
+												};
+											};
+											class Item36
+											{
+												class data
+												{
+													singleType="STRING";
+													value="Radio";
+												};
+											};
+											class Item37
+											{
+												class data
+												{
+													singleType="SCALAR";
+													value=0;
+												};
+											};
+											class Item38
+											{
+												class data
+												{
+													singleType="STRING";
+													value="PoliceComputer";
+												};
+											};
+											class Item39
+											{
+												class data
+												{
+													singleType="SCALAR";
+													value=0;
+												};
+											};
+											class Item40
+											{
+												class data
+												{
+													singleType="STRING";
+													value="HandSpotlight";
+												};
+											};
+											class Item41
+											{
+												class data
+												{
+													singleType="SCALAR";
+													value=0;
+												};
+											};
+											class Item42
+											{
+												class data
+												{
+													singleType="STRING";
+													value="Radar";
+												};
+											};
+											class Item43
+											{
+												class data
+												{
+													singleType="SCALAR";
+													value=0;
+												};
+											};
+											class Item44
+											{
+												class data
+												{
+													singleType="STRING";
+													value="RoadCone";
+												};
+											};
+											class Item45
+											{
+												class data
+												{
+													singleType="SCALAR";
+													value=0;
+												};
+											};
+											class Item46
+											{
+												class data
+												{
+													singleType="STRING";
+													value="RoadFlares";
+												};
+											};
+											class Item47
+											{
+												class data
+												{
+													singleType="SCALAR";
+													value=0;
+												};
+											};
+											class Item48
+											{
+												class data
+												{
+													singleType="STRING";
+													value="Shotgun";
+												};
+											};
+											class Item49
+											{
+												class data
+												{
+													singleType="SCALAR";
+													value=0;
+												};
+											};
+											class Item50
+											{
+												class data
+												{
+													singleType="STRING";
+													value="Lightbar_BEACON_17";
+												};
+											};
+											class Item51
+											{
+												class data
+												{
+													singleType="SCALAR";
+													value=0;
+												};
+											};
+											class Item52
+											{
+												class data
+												{
+													singleType="STRING";
+													value="Lightbar_Can";
+												};
+											};
+											class Item53
+											{
+												class data
+												{
+													singleType="SCALAR";
+													value=0;
+												};
+											};
+											class Item54
+											{
+												class data
+												{
+													singleType="STRING";
+													value="Lightbar_Can_Amber";
+												};
+											};
+											class Item55
+											{
+												class data
+												{
+													singleType="SCALAR";
+													value=0;
+												};
+											};
+											class Item56
+											{
+												class data
+												{
+													singleType="STRING";
+													value="Lightbar_Can_Red";
+												};
+											};
+											class Item57
+											{
+												class data
+												{
+													singleType="SCALAR";
+													value=0;
+												};
+											};
+											class Item58
+											{
+												class data
+												{
+													singleType="STRING";
+													value="Lightbar_CJ_184";
+												};
+											};
+											class Item59
+											{
+												class data
+												{
+													singleType="SCALAR";
+													value=0;
+												};
+											};
+											class Item60
+											{
+												class data
+												{
+													singleType="STRING";
+													value="Lightbar_mars_skybolt";
+												};
+											};
+											class Item61
+											{
+												class data
+												{
+													singleType="SCALAR";
+													value=0;
+												};
+											};
+											class Item62
+											{
+												class data
+												{
+													singleType="STRING";
+													value="Lightbar_twin_sonic_chp";
+												};
+											};
+											class Item63
+											{
+												class data
+												{
+													singleType="SCALAR";
+													value=0;
+												};
+											};
+											class Item64
+											{
+												class data
+												{
+													singleType="STRING";
+													value="Lightbar_Fireball";
+												};
+											};
+											class Item65
+											{
+												class data
+												{
+													singleType="SCALAR";
+													value=0;
+												};
+											};
+											class Item66
+											{
+												class data
+												{
+													singleType="STRING";
+													value="Lightbar_Aerodynic";
+												};
+											};
+											class Item67
+											{
+												class data
+												{
+													singleType="SCALAR";
+													value=0;
+												};
+											};
+											class Item68
+											{
+												class data
+												{
+													singleType="STRING";
+													value="WheelAddon1";
+												};
+											};
+											class Item69
+											{
+												class data
+												{
+													singleType="SCALAR";
+													value=0;
+												};
+											};
+											class Item70
+											{
+												class data
+												{
+													singleType="STRING";
+													value="WheelAddon2";
+												};
+											};
+											class Item71
+											{
+												class data
+												{
+													singleType="SCALAR";
+													value=0;
+												};
+											};
+											class Item72
+											{
+												class data
+												{
+													singleType="STRING";
+													value="WheelAddon3";
+												};
+											};
+											class Item73
+											{
+												class data
+												{
+													singleType="SCALAR";
+													value=0;
+												};
+											};
+											class Item74
+											{
+												class data
+												{
+													singleType="STRING";
+													value="WheelAddon4";
+												};
+											};
+											class Item75
+											{
+												class data
+												{
+													singleType="SCALAR";
+													value=0;
+												};
+											};
+											class Item76
+											{
+												class data
+												{
+													singleType="STRING";
+													value="WheelAddon5";
+												};
+											};
+											class Item77
+											{
+												class data
+												{
+													singleType="SCALAR";
+													value=0;
+												};
+											};
+											class Item78
+											{
+												class data
+												{
+													singleType="STRING";
+													value="WheelAddon6";
+												};
+											};
+											class Item79
+											{
+												class data
+												{
+													singleType="SCALAR";
+													value=0;
+												};
+											};
+											class Item80
+											{
+												class data
+												{
+													singleType="STRING";
+													value="WheelAddon7";
+												};
+											};
+											class Item81
+											{
+												class data
+												{
+													singleType="SCALAR";
+													value=0;
+												};
+											};
+											class Item82
+											{
+												class data
+												{
+													singleType="STRING";
+													value="WheelAddon8";
+												};
+											};
+											class Item83
+											{
+												class data
+												{
+													singleType="SCALAR";
+													value=0;
+												};
+											};
+											class Item84
+											{
+												class data
+												{
+													singleType="STRING";
+													value="WheelAddon9";
+												};
+											};
+											class Item85
+											{
+												class data
+												{
+													singleType="SCALAR";
+													value=0;
+												};
+											};
+											class Item86
+											{
+												class data
+												{
+													singleType="STRING";
+													value="WheelAddon10";
+												};
+											};
+											class Item87
+											{
+												class data
+												{
+													singleType="SCALAR";
+													value=0;
+												};
+											};
+											class Item88
+											{
+												class data
+												{
+													singleType="STRING";
+													value="WheelAddon11";
+												};
+											};
+											class Item89
+											{
+												class data
+												{
+													singleType="SCALAR";
+													value=0;
+												};
+											};
+											class Item90
+											{
+												class data
+												{
+													singleType="STRING";
+													value="WheelAddon12";
+												};
+											};
+											class Item91
+											{
+												class data
+												{
+													singleType="SCALAR";
+													value=0;
+												};
+											};
+											class Item92
+											{
+												class data
+												{
+													singleType="STRING";
+													value="WheelAddon13";
+												};
+											};
+											class Item93
+											{
+												class data
+												{
+													singleType="SCALAR";
+													value=0;
+												};
+											};
+											class Item94
+											{
+												class data
+												{
+													singleType="STRING";
+													value="WheelAddon14";
+												};
+											};
+											class Item95
+											{
+												class data
+												{
+													singleType="SCALAR";
+													value=0;
+												};
+											};
+											class Item96
+											{
+												class data
+												{
+													singleType="STRING";
+													value="WheelAddon15";
+												};
+											};
+											class Item97
+											{
+												class data
+												{
+													singleType="SCALAR";
+													value=0;
+												};
+											};
+											class Item98
+											{
+												class data
+												{
+													singleType="STRING";
+													value="WheelAddon16";
+												};
+											};
+											class Item99
+											{
+												class data
+												{
+													singleType="SCALAR";
+													value=0;
+												};
+											};
+											class Item100
+											{
+												class data
+												{
+													singleType="STRING";
+													value="WheelAddon17";
+												};
+											};
+											class Item101
+											{
+												class data
+												{
+													singleType="SCALAR";
+													value=0;
+												};
+											};
+											class Item102
+											{
+												class data
+												{
+													singleType="STRING";
+													value="WheelAddon18";
+												};
+											};
+											class Item103
+											{
+												class data
+												{
+													singleType="SCALAR";
+													value=0;
+												};
+											};
+											class Item104
+											{
+												class data
+												{
+													singleType="STRING";
+													value="WheelAddon19";
+												};
+											};
+											class Item105
+											{
+												class data
+												{
+													singleType="SCALAR";
+													value=0;
+												};
+											};
+											class Item106
+											{
+												class data
+												{
+													singleType="STRING";
+													value="WheelAddon20";
+												};
+											};
+											class Item107
+											{
+												class data
+												{
+													singleType="SCALAR";
+													value=0;
+												};
+											};
+											class Item108
+											{
+												class data
+												{
+													singleType="STRING";
+													value="WheelAddon21";
+												};
+											};
+											class Item109
+											{
+												class data
+												{
+													singleType="SCALAR";
+													value=0;
+												};
+											};
+											class Item110
+											{
+												class data
+												{
+													singleType="STRING";
+													value="WheelAddon22";
+												};
+											};
+											class Item111
+											{
+												class data
+												{
+													singleType="SCALAR";
+													value=0;
+												};
+											};
+											class Item112
+											{
+												class data
+												{
+													singleType="STRING";
+													value="WheelAddon23";
+												};
+											};
+											class Item113
+											{
+												class data
+												{
+													singleType="SCALAR";
+													value=0;
+												};
+											};
+											class Item114
+											{
+												class data
+												{
+													singleType="STRING";
+													value="WheelAddon24";
+												};
+											};
+											class Item115
+											{
+												class data
+												{
+													singleType="SCALAR";
+													value=0;
+												};
+											};
+											class Item116
+											{
+												class data
+												{
+													singleType="STRING";
+													value="WheelAddon25";
+												};
+											};
+											class Item117
+											{
+												class data
+												{
+													singleType="SCALAR";
+													value=0;
+												};
+											};
+											class Item118
+											{
+												class data
+												{
+													singleType="STRING";
+													value="WheelAddon26";
+												};
+											};
+											class Item119
+											{
+												class data
+												{
+													singleType="SCALAR";
+													value=0;
+												};
+											};
+											class Item120
+											{
+												class data
+												{
+													singleType="STRING";
+													value="WheelAddon27";
+												};
+											};
+											class Item121
+											{
+												class data
+												{
+													singleType="SCALAR";
+													value=0;
+												};
+											};
+											class Item122
+											{
+												class data
+												{
+													singleType="STRING";
+													value="WheelAddon28";
+												};
+											};
+											class Item123
+											{
+												class data
+												{
+													singleType="SCALAR";
+													value=0;
+												};
+											};
+											class Item124
+											{
+												class data
+												{
+													singleType="STRING";
+													value="WheelAddon29";
+												};
+											};
+											class Item125
+											{
+												class data
+												{
+													singleType="SCALAR";
+													value=0;
+												};
+											};
+											class Item126
+											{
+												class data
+												{
+													singleType="STRING";
+													value="WheelAddon30";
+												};
+											};
+											class Item127
+											{
+												class data
+												{
+													singleType="SCALAR";
+													value=0;
+												};
+											};
+											class Item128
+											{
+												class data
+												{
+													singleType="STRING";
+													value="WheelAddon31";
+												};
+											};
+											class Item129
+											{
+												class data
+												{
+													singleType="SCALAR";
+													value=0;
+												};
+											};
+											class Item130
+											{
+												class data
+												{
+													singleType="STRING";
+													value="WheelAddon32";
+												};
+											};
+											class Item131
+											{
+												class data
+												{
+													singleType="SCALAR";
+													value=0;
+												};
+											};
+											class Item132
+											{
+												class data
+												{
+													singleType="STRING";
+													value="WheelAddon33";
+												};
+											};
+											class Item133
+											{
+												class data
+												{
+													singleType="SCALAR";
+													value=0;
+												};
+											};
+											class Item134
+											{
+												class data
+												{
+													singleType="STRING";
+													value="WheelAddon34";
+												};
+											};
+											class Item135
+											{
+												class data
+												{
+													singleType="SCALAR";
+													value=0;
+												};
+											};
+											class Item136
+											{
+												class data
+												{
+													singleType="STRING";
+													value="WheelAddon35";
+												};
+											};
+											class Item137
+											{
+												class data
+												{
+													singleType="SCALAR";
+													value=0;
+												};
+											};
+											class Item138
+											{
+												class data
+												{
+													singleType="STRING";
+													value="WheelAddon36";
+												};
+											};
+											class Item139
+											{
+												class data
+												{
+													singleType="SCALAR";
+													value=0;
+												};
+											};
+											class Item140
+											{
+												class data
+												{
+													singleType="STRING";
+													value="WheelAddon37";
+												};
+											};
+											class Item141
+											{
+												class data
+												{
+													singleType="SCALAR";
+													value=0;
+												};
+											};
+											class Item142
+											{
+												class data
+												{
+													singleType="STRING";
+													value="WheelAddon38";
+												};
+											};
+											class Item143
+											{
+												class data
+												{
+													singleType="SCALAR";
+													value=0;
+												};
+											};
+											class Item144
+											{
+												class data
+												{
+													singleType="STRING";
+													value="WheelAddon39";
+												};
+											};
+											class Item145
+											{
+												class data
+												{
+													singleType="SCALAR";
+													value=0;
+												};
+											};
+											class Item146
+											{
+												class data
+												{
+													singleType="STRING";
+													value="WheelAddon40";
+												};
+											};
+											class Item147
+											{
+												class data
+												{
+													singleType="SCALAR";
+													value=0;
+												};
+											};
+											class Item148
+											{
+												class data
+												{
+													singleType="STRING";
+													value="WheelAddon41";
+												};
+											};
+											class Item149
+											{
+												class data
+												{
+													singleType="SCALAR";
+													value=0;
+												};
+											};
+											class Item150
+											{
+												class data
+												{
+													singleType="STRING";
+													value="WheelAddon42";
+												};
+											};
+											class Item151
+											{
+												class data
+												{
+													singleType="SCALAR";
+													value=0;
+												};
+											};
+											class Item152
+											{
+												class data
+												{
+													singleType="STRING";
+													value="WheelAddon43";
+												};
+											};
+											class Item153
+											{
+												class data
+												{
+													singleType="SCALAR";
+													value=0;
+												};
+											};
+											class Item154
+											{
+												class data
+												{
+													singleType="STRING";
+													value="WheelAddon44";
+												};
+											};
+											class Item155
+											{
+												class data
+												{
+													singleType="SCALAR";
+													value=0;
+												};
+											};
+											class Item156
+											{
+												class data
+												{
+													singleType="STRING";
+													value="WheelAddon45";
+												};
+											};
+											class Item157
+											{
+												class data
+												{
+													singleType="SCALAR";
+													value=0;
+												};
+											};
+											class Item158
+											{
+												class data
+												{
+													singleType="STRING";
+													value="WheelAddon46";
+												};
+											};
+											class Item159
+											{
+												class data
+												{
+													singleType="SCALAR";
+													value=0;
+												};
+											};
+											class Item160
+											{
+												class data
+												{
+													singleType="STRING";
+													value="WheelAddon47";
+												};
+											};
+											class Item161
+											{
+												class data
+												{
+													singleType="SCALAR";
+													value=0;
+												};
+											};
+											class Item162
+											{
+												class data
+												{
+													singleType="STRING";
+													value="WheelAddon48";
+												};
+											};
+											class Item163
+											{
+												class data
+												{
+													singleType="SCALAR";
+													value=0;
+												};
+											};
+											class Item164
+											{
+												class data
+												{
+													singleType="STRING";
+													value="WheelAddon49";
+												};
+											};
+											class Item165
+											{
+												class data
+												{
+													singleType="SCALAR";
+													value=0;
+												};
+											};
+											class Item166
+											{
+												class data
+												{
+													singleType="STRING";
+													value="WheelAddon50";
+												};
+											};
+											class Item167
+											{
+												class data
+												{
+													singleType="SCALAR";
+													value=0;
+												};
+											};
+											class Item168
+											{
+												class data
+												{
+													singleType="STRING";
+													value="WheelAddon51";
+												};
+											};
+											class Item169
+											{
+												class data
+												{
+													singleType="SCALAR";
+													value=0;
+												};
+											};
+											class Item170
+											{
+												class data
+												{
+													singleType="STRING";
+													value="WheelAddon52";
+												};
+											};
+											class Item171
+											{
+												class data
+												{
+													singleType="SCALAR";
+													value=0;
+												};
+											};
+											class Item172
+											{
+												class data
+												{
+													singleType="STRING";
+													value="WheelAddon53";
+												};
+											};
+											class Item173
+											{
+												class data
+												{
+													singleType="SCALAR";
+													value=0;
+												};
+											};
+											class Item174
+											{
+												class data
+												{
+													singleType="STRING";
+													value="WheelAddon54";
+												};
+											};
+											class Item175
+											{
+												class data
+												{
+													singleType="SCALAR";
+													value=0;
+												};
+											};
+											class Item176
+											{
+												class data
+												{
+													singleType="STRING";
+													value="WheelAddon55";
+												};
+											};
+											class Item177
+											{
+												class data
+												{
+													singleType="SCALAR";
+													value=0;
+												};
+											};
+											class Item178
+											{
+												class data
+												{
+													singleType="STRING";
+													value="WheelAddon56";
+												};
+											};
+											class Item179
+											{
+												class data
+												{
+													singleType="SCALAR";
+													value=0;
+												};
+											};
+											class Item180
+											{
+												class data
+												{
+													singleType="STRING";
+													value="WheelAddon57";
+												};
+											};
+											class Item181
+											{
+												class data
+												{
+													singleType="SCALAR";
+													value=0;
+												};
+											};
+											class Item182
+											{
+												class data
+												{
+													singleType="STRING";
+													value="WheelAddon58";
+												};
+											};
+											class Item183
+											{
+												class data
+												{
+													singleType="SCALAR";
+													value=0;
+												};
+											};
+											class Item184
+											{
+												class data
+												{
+													singleType="STRING";
+													value="WheelAddon59";
+												};
+											};
+											class Item185
+											{
+												class data
+												{
+													singleType="SCALAR";
+													value=0;
+												};
+											};
+											class Item186
+											{
+												class data
+												{
+													singleType="STRING";
+													value="WheelAddon60";
+												};
+											};
+											class Item187
+											{
+												class data
+												{
+													singleType="SCALAR";
+													value=0;
+												};
+											};
+											class Item188
+											{
+												class data
+												{
+													singleType="STRING";
+													value="WheelAddon61";
+												};
+											};
+											class Item189
+											{
+												class data
+												{
+													singleType="SCALAR";
+													value=0;
+												};
+											};
+											class Item190
+											{
+												class data
+												{
+													singleType="STRING";
+													value="WheelAddon62";
+												};
+											};
+											class Item191
+											{
+												class data
+												{
+													singleType="SCALAR";
+													value=0;
+												};
+											};
+											class Item192
+											{
+												class data
+												{
+													singleType="STRING";
+													value="WheelAddon63";
+												};
+											};
+											class Item193
+											{
+												class data
+												{
+													singleType="SCALAR";
+													value=0;
+												};
+											};
+											class Item194
+											{
+												class data
+												{
+													singleType="STRING";
+													value="WheelAddon64";
+												};
+											};
+											class Item195
+											{
+												class data
+												{
+													singleType="SCALAR";
+													value=0;
+												};
+											};
+											class Item196
+											{
+												class data
+												{
+													singleType="STRING";
+													value="WheelAddon65";
+												};
+											};
+											class Item197
+											{
+												class data
+												{
+													singleType="SCALAR";
+													value=0;
+												};
+											};
+											class Item198
+											{
+												class data
+												{
+													singleType="STRING";
+													value="WheelAddon66";
+												};
+											};
+											class Item199
+											{
+												class data
+												{
+													singleType="SCALAR";
+													value=0;
+												};
+											};
+											class Item200
+											{
+												class data
+												{
+													singleType="STRING";
+													value="WheelAddon67";
+												};
+											};
+											class Item201
+											{
+												class data
+												{
+													singleType="SCALAR";
+													value=0;
+												};
+											};
+											class Item202
+											{
+												class data
+												{
+													singleType="STRING";
+													value="WheelAddon68";
+												};
+											};
+											class Item203
+											{
+												class data
+												{
+													singleType="SCALAR";
+													value=0;
+												};
+											};
+											class Item204
+											{
+												class data
+												{
+													singleType="STRING";
+													value="WheelAddon69";
+												};
+											};
+											class Item205
+											{
+												class data
+												{
+													singleType="SCALAR";
+													value=0;
+												};
+											};
+											class Item206
+											{
+												class data
+												{
+													singleType="STRING";
+													value="WheelAddon70";
+												};
+											};
+											class Item207
+											{
+												class data
+												{
+													singleType="SCALAR";
+													value=0;
+												};
+											};
+										};
+									};
+								};
+							};
+						};
+					};
+				};
+				nAttributes=2;
+			};
+		};
+		class Item24
 		{
 			dataType="Object";
 			class PositionInfo
@@ -18239,6 +18274,23 @@ class Mission
 				};
 				nAttributes=1;
 			};
+		};
+		class Item25
+		{
+			dataType="Object";
+			class PositionInfo
+			{
+				position[]={9992.0342,141.71964,10006.748};
+				angles[]={0,1.5707964,0};
+			};
+			side="Empty";
+			flags=4;
+			class Attributes
+			{
+				name="car1";
+			};
+			id=27;
+			type="RetroRP_Vandura";
 		};
 	};
 };
