@@ -8,14 +8,14 @@ class EditorData
 	toggles=1;
 	class ItemIDProvider
 	{
-		nextID=42;
+		nextID=43;
 	};
 	class Camera
 	{
-		pos[]={9982.8516,144.17339,10027.849};
-		dir[]={0.28282472,-0.3594088,-0.88930869};
-		up[]={0.10893065,0.93317538,-0.34251839};
-		aside[]={-0.95298636,1.6676495e-07,-0.30307698};
+		pos[]={9983.9473,140.3452,10015.911};
+		dir[]={0.59923214,-0.29930606,-0.74255532};
+		up[]={0.18797119,0.95415413,-0.23292951};
+		aside[]={-0.77823079,3.085006e-07,-0.62802225};
 	};
 };
 binarizationWanted=0;
@@ -23,7 +23,6 @@ sourceName="towtruck_test";
 addons[]=
 {
 	"RetroRP_Monaco",
-	"RetroRP_Dart",
 	"RetroRP_Charger69",
 	"RetroRP_F100",
 	"RetroRP_Vandura",
@@ -39,7 +38,8 @@ addons[]=
 	"RetroRP_Defender",
 	"A3_Characters_F",
 	"A3_Characters_F_Exp_Civil",
-	"A3_Signs_F"
+	"A3_Signs_F",
+	"RetroRP_Dart"
 };
 class AddonsMetaData
 {
@@ -140,22 +140,6 @@ class Mission
 			dataType="Object";
 			class PositionInfo
 			{
-				position[]={9985.9326,140.19673,10006.753};
-				angles[]={-0,1.5707964,0};
-			};
-			side="Empty";
-			flags=4;
-			class Attributes
-			{
-			};
-			id=1;
-			type="RetroRP_Dart";
-		};
-		class Item2
-		{
-			dataType="Object";
-			class PositionInfo
-			{
 				position[]={9973.6064,139.53691,9988.3486};
 				angles[]={0,3.1412215,0};
 			};
@@ -167,7 +151,7 @@ class Mission
 			id=2;
 			type="RetroRP_Charger69";
 		};
-		class Item3
+		class Item2
 		{
 			dataType="Object";
 			class PositionInfo
@@ -183,7 +167,7 @@ class Mission
 			id=3;
 			type="RetroRP_F100";
 		};
-		class Item4
+		class Item3
 		{
 			dataType="Object";
 			class PositionInfo
@@ -199,7 +183,7 @@ class Mission
 			id=4;
 			type="RetroRP_Vandura";
 		};
-		class Item5
+		class Item4
 		{
 			dataType="Object";
 			class PositionInfo
@@ -215,7 +199,7 @@ class Mission
 			id=5;
 			type="RetroRP_288_GTO";
 		};
-		class Item6
+		class Item5
 		{
 			dataType="Object";
 			class PositionInfo
@@ -231,7 +215,7 @@ class Mission
 			id=6;
 			type="RetroRP_CorvetteZR1";
 		};
-		class Item7
+		class Item6
 		{
 			dataType="Object";
 			class PositionInfo
@@ -247,7 +231,7 @@ class Mission
 			id=7;
 			type="RetroRP_Vandura_Ambulance";
 		};
-		class Item8
+		class Item7
 		{
 			dataType="Object";
 			class PositionInfo
@@ -2242,7 +2226,7 @@ class Mission
 				nAttributes=1;
 			};
 		};
-		class Item9
+		class Item8
 		{
 			dataType="Object";
 			class PositionInfo
@@ -3981,7 +3965,7 @@ class Mission
 				nAttributes=1;
 			};
 		};
-		class Item10
+		class Item9
 		{
 			dataType="Object";
 			class PositionInfo
@@ -5976,7 +5960,7 @@ class Mission
 				nAttributes=1;
 			};
 		};
-		class Item11
+		class Item10
 		{
 			dataType="Object";
 			class PositionInfo
@@ -7698,7 +7682,7 @@ class Mission
 				nAttributes=1;
 			};
 		};
-		class Item12
+		class Item11
 		{
 			dataType="Object";
 			class PositionInfo
@@ -7714,7 +7698,7 @@ class Mission
 			id=12;
 			type="RetroRP_Forklift";
 		};
-		class Item13
+		class Item12
 		{
 			dataType="Object";
 			class PositionInfo
@@ -7730,7 +7714,7 @@ class Mission
 			id=13;
 			type="RetroRP_Frontend_Loader";
 		};
-		class Item14
+		class Item13
 		{
 			dataType="Object";
 			class PositionInfo
@@ -7746,7 +7730,7 @@ class Mission
 			id=14;
 			type="RetroRP_Mack_CF_Rescue";
 		};
-		class Item15
+		class Item14
 		{
 			dataType="Object";
 			class PositionInfo
@@ -7762,7 +7746,7 @@ class Mission
 			id=15;
 			type="RetroRP_Tractor_Old";
 		};
-		class Item16
+		class Item15
 		{
 			dataType="Object";
 			class PositionInfo
@@ -7778,7 +7762,7 @@ class Mission
 			id=16;
 			type="RetroRP_Defender";
 		};
-		class Item17
+		class Item16
 		{
 			dataType="Object";
 			class PositionInfo
@@ -9531,7 +9515,7 @@ class Mission
 				nAttributes=2;
 			};
 		};
-		class Item18
+		class Item17
 		{
 			dataType="Group";
 			side="Civilian";
@@ -9561,7 +9545,7 @@ class Mission
 			};
 			id=19;
 		};
-		class Item19
+		class Item18
 		{
 			dataType="Object";
 			class PositionInfo
@@ -11314,7 +11298,7 @@ class Mission
 				nAttributes=2;
 			};
 		};
-		class Item20
+		class Item19
 		{
 			dataType="Object";
 			class PositionInfo
@@ -13067,7 +13051,7 @@ class Mission
 				nAttributes=2;
 			};
 		};
-		class Item21
+		class Item20
 		{
 			dataType="Object";
 			class PositionInfo
@@ -14820,7 +14804,7 @@ class Mission
 				nAttributes=2;
 			};
 		};
-		class Item22
+		class Item21
 		{
 			dataType="Object";
 			class PositionInfo
@@ -14836,13 +14820,13 @@ class Mission
 			id=38;
 			type="RoadCone_L_F";
 		};
-		class Item23
+		class Item22
 		{
 			dataType="Object";
 			class PositionInfo
 			{
 				position[]={9987.3975,138.57211,10004.664};
-				angles[]={-0,1.5707964,0};
+				angles[]={0,1.5707964,0};
 			};
 			side="Empty";
 			flags=4;
@@ -14852,13 +14836,13 @@ class Mission
 			id=39;
 			type="RoadCone_L_F";
 		};
-		class Item24
+		class Item23
 		{
 			dataType="Object";
 			class PositionInfo
 			{
 				position[]={9971.4355,140.19673,9988.5215};
-				angles[]={-0,3.1412215,0};
+				angles[]={0,3.1412215,0};
 			};
 			side="Empty";
 			flags=4;
@@ -14867,6 +14851,22 @@ class Mission
 			};
 			id=41;
 			type="RetroRP_Dart";
+		};
+		class Item24
+		{
+			dataType="Object";
+			class PositionInfo
+			{
+				position[]={9986.2324,140.63184,10006.793};
+				angles[]={-0,4.712389,0};
+			};
+			side="Empty";
+			flags=4;
+			class Attributes
+			{
+			};
+			id=42;
+			type="RetroRP_Forklift";
 		};
 	};
 };

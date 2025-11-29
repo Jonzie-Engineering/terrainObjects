@@ -1,4 +1,3 @@
-highestSteps = 0;
 vehicleInit = {
     params [["_truck", objNull], ["_object", objNull]];
     _truck animateSource ["flatdeck_body", 1, true];
@@ -104,10 +103,6 @@ towLoop = {
         _Ball setPosASL _begPos;
         _Ball2 setPosASL _endPos;
         sleep 0.05;
-        hintSilent format [
-            "_begPos:%1 _endPos:%2 Intersect:%3 Speed:%4 Target:%5",
-            _begPos, _endPos, _Intersect, _curSpeed, _targetSpeed
-        ];
     };
     ropeUnwind [_rope, 10, 0,true];
     _object disableBrakes false;
@@ -117,7 +112,7 @@ ServerModules_fnc_towTruckAutoLoad = {
 
     if (isNull _truck)exitwith {hint "Towtruck not found."};
     if (_truck animationSourcePhase "flatdeck_body" < 1)exitwith {hint "Flatbed not installed"};
-    if (_truck animationSourcePhase "flatdeck_lift" < 1 || _truck animationSourcePhase "flatdeck_slide" < 1)exitwith {hint "Flatbed not on the ground"};
+    if (_truck animationSourcePhase "flatdeck_lift" < 1 || _truck animationSourcePhase "flatdeck_slide" < 1)exitwith {hint "Ramp not on the ground"};
     if (_truck animationSourcePhase "PTO" < 1)exitwith {hint "PTO must be engaged"};
     
     // Boost system
@@ -128,10 +123,12 @@ ServerModules_fnc_towTruckAutoLoad = {
     private _object = objNull;
     private _exit = false;
     private _aligned = [];
+    
     private _pos1 = (_truck selectionPosition "Flatdeck_AttachPoint_Rear");
     private _pos2 = _pos1 vectorAdd [0,-1,3];
     private _backPos = _truck modelToWorldWorld _pos1;
     private _backPosDir = _truck modelToWorldWorld _pos2;
+    
     private _frontPos1 = _truck modelToWorldWorld (_truck selectionPosition "Flatdeck_IntersectStart");
     private _frontPos1Dir = _truck modelToWorldWorld (_truck selectionPosition "Flatdeck_IntersectEnd");
     private _frontPos2 = _truck modelToWorldWorld (_truck selectionPosition "Flatdeck_Intersect2Start");
@@ -143,38 +140,17 @@ ServerModules_fnc_towTruckAutoLoad = {
     private _frontPos5 = _truck modelToWorldWorld (_truck selectionPosition "Flatdeck_Intersect5Start");
     private _frontPos5Dir = _truck modelToWorldWorld (_truck selectionPosition "Flatdeck_Intersect5End");
 
-    private _Ball = createVehicle ["Sign_Sphere25cm_F", _frontPos1, [], 0, "CAN_COLLIDE"];
-    _Ball setPosASL _frontPos1;
-    private _Ball2 = createVehicle ["Sign_Sphere25cm_F", _frontPos1Dir, [], 0, "CAN_COLLIDE"];
-    _Ball2 setPosASL _frontPos1Dir;
-    private _Ball3 = createVehicle ["Sign_Sphere25cm_F", _frontPos2, [], 0, "CAN_COLLIDE"];
-    _Ball3 setPosASL _frontPos2;
-    private _Ball4 = createVehicle ["Sign_Sphere25cm_F", _frontPos2Dir, [], 0, "CAN_COLLIDE"];
-    _Ball4 setPosASL _frontPos2Dir;
-    private _Ball5 = createVehicle ["Sign_Sphere25cm_F", _frontPos3, [], 0, "CAN_COLLIDE"];
-    _Ball5 setPosASL _frontPos3;
-    private _Ball6 = createVehicle ["Sign_Sphere25cm_F", _frontPos3Dir, [], 0, "CAN_COLLIDE"];
-    _Ball6 setPosASL _frontPos3Dir;
-    private _Ball7 = createVehicle ["Sign_Sphere25cm_F", _frontPos4, [], 0, "CAN_COLLIDE"];
-    _Ball7 setPosASL _frontPos4;
-    private _Ball8 = createVehicle ["Sign_Sphere25cm_F", _frontPos4Dir, [], 0, "CAN_COLLIDE"];
-    _Ball8 setPosASL _frontPos4Dir;
-    private _Ball9 = createVehicle ["Sign_Sphere25cm_F", _frontPos5, [], 0, "CAN_COLLIDE"];
-    _Ball9 setPosASL _frontPos5;
-    private _Ball10 = createVehicle ["Sign_Sphere25cm_F", _frontPos5Dir, [], 0, "CAN_COLLIDE"];
-    _Ball10 setPosASL _frontPos5Dir;
-    
     //if (true) exitwith {};
     private _intersectBack = lineIntersectsObjs [_backPos, _BackPosDir, _truck];
     private _intersectFront = lineIntersectsObjs [_frontPos1, _frontPos1Dir, _truck]+lineIntersectsObjs [_frontPos2, _frontPos2Dir, _truck]+lineIntersectsObjs [_frontPos3, _frontPos3Dir, _truck]+lineIntersectsObjs [_frontPos4, _frontPos4Dir, _truck]+lineIntersectsObjs [_frontPos5, _frontPos5Dir, _truck];
-    if (count _intersectBack < 1) exitwith {hint "No vehicle found";deleteVehicle (nearestObjects [_truck, ["RetroRP_Mini","RetroRP_Monaco","RetroRP_Dart","RetroRP_Charger69","RetroRP_F100","RetroRP_Vandura","RetroRP_288_GTO","RetroRP_CorvetteZR1","RetroRP_Vandura_Ambulance","RetroRP_W900","RetroRP_Dozer","RetroRP_Forklift","RetroRP_Frontend_Loader","RetroRP_Defender"], 15]select 0);};
+    if (count _intersectBack < 1) exitwith {hint "No vehicle found";};
     
     {
         // alignment of truck relative to _x (0..360)
         private _alignment = [_truck, _x] call BIS_fnc_relativeDirTo;
 
         // if truck is not roughly behind _x (outside 160..200) then bail out
-        if (_alignment < 179 || _alignment > 181) exitWith { _exit = true;deleteVehicle _x};
+        if (_alignment < 179 || _alignment > 181) exitWith { _exit = true;};
 
         // alignment of _x relative to truck (0..360)
         private _alignmentTruck = [_x, _truck] call BIS_fnc_relativeDirTo;
@@ -187,10 +163,10 @@ ServerModules_fnc_towTruckAutoLoad = {
         // if _x is facing roughly opposite the truck (within 160..200)
         if (_alignmentTruck >= 170 && _alignmentTruck <= 190) exitWith { _x setDir (getDir _truck + 180);_aligned pushBack _x; };
         
-        if (_exit || count _aligned < 1) exitWith {deleteVehicle _x;hint "Vehicle not positioned correctly"};
+        if (_exit || count _aligned < 1) exitWith {hint "Vehicle not positioned correctly"};
 
     } forEach _intersectBack;
-    if (_exit || count _aligned < 1) exitWith {hint "Vehicle not positioned correctly";deleteVehicle (nearestObjects [_truck, ["RetroRP_Mini","RetroRP_Monaco","RetroRP_Dart","RetroRP_Charger69","RetroRP_F100","RetroRP_Vandura","RetroRP_288_GTO","RetroRP_CorvetteZR1","RetroRP_Vandura_Ambulance","RetroRP_W900","RetroRP_Dozer","RetroRP_Forklift","RetroRP_Frontend_Loader","RetroRP_Defender"], 15]select 0);};
+    if (_exit || count _aligned < 1) exitWith {hint "Vehicle not positioned correctly";};
     
     for "_i" from 0 to 1000 do
 	{
@@ -221,8 +197,6 @@ ServerModules_fnc_towTruckAutoLoad = {
             _velocity set [1,_Yvector];
             _object setVelocityModelSpace _velocity;
             if (_object IN _intersectFront)exitwith{};
-            hint format ["Step:%1",_i];
-            if (_i > highestSteps ) then {highestSteps = _i;};
         
         } forEach _intersectBack;
         
@@ -235,16 +209,20 @@ ServerModules_fnc_towTruckAutoLoad = {
         _x disableBrakes false;
         [_truck,_x,"Flatdeck_AttachPoint_Center"] call ServerModules_fnc_attachRelativeMemory;
     } forEach _intersectBack;
-    hint format ["highestSteps:%1",highestSteps];
     _truck animateSource ["flatdeck_lift", 0];
     _truck animateSource ["flatdeck_slide", 0];
+    waitUntil {_truck animationSourcePhase "flatdeck_lift" <= 0 && _truck animationSourcePhase "flatdeck_slide" <= 0};
+    _truck animateSource ["flatdeck_lift", 1];
+    _truck animateSource ["flatdeck_slide", 1];
+    waitUntil {_truck animationSourcePhase "flatdeck_lift" >= 1 && _truck animationSourcePhase "flatdeck_slide" >= 1};
+    [_truck] spawn ServerModules_fnc_towTruckAutoUnload;
 };
 ServerModules_fnc_towTruckAutoUnload = {
     params [ ["_truck", objNull] ];
 
     if (isNull _truck)exitwith {hint "Towtruck not found."};
     if (_truck animationSourcePhase "flatdeck_body" < 1)exitwith {hint "Flatbed not installed"};
-    if (_truck animationSourcePhase "flatdeck_lift" < 1 || _truck animationSourcePhase "flatdeck_slide" < 1)exitwith {hint "Flatbed not on the ground"};
+    if (_truck animationSourcePhase "flatdeck_lift" < 1 || _truck animationSourcePhase "flatdeck_slide" < 1)exitwith {hint "Ramp not on the ground"};
     if (_truck animationSourcePhase "PTO" < 1)exitwith {hint "PTO must be engaged"};
     
     // Boost system
@@ -254,31 +232,25 @@ ServerModules_fnc_towTruckAutoUnload = {
     private _targetSpeed = 5;// Target speed in m/s (1 kph ≈ 0.27778)
     private _object = objNull;
     private _exit = false;
-    private _aligned = [];
+    private _objects = [];
     private _dummy = _truck getVariable ["RRP_attachToDummy", objNull];
-    private _pos1 = (_truck selectionPosition "Flatdeck_AttachPoint_Rear");
-    private _pos2 = _pos1 vectorAdd [0,-1,3];
-    private _backPos = _truck modelToWorldWorld _pos1;
-    private _backPosDir = _truck modelToWorldWorld _pos2;
+    
     private _frontPos1 = _truck modelToWorldWorld (_truck selectionPosition "Flatdeck_IntersectStart");
-    private _frontPos1Dir = _truck modelToWorldWorld (_truck selectionPosition "Flatdeck_IntersectEnd");
+    private _frontPos1Dir = _truck modelToWorldWorld (_truck selectionPosition "Flatdeck_IntersectEnd")vectorAdd [-6,0,-1.5];
     private _frontPos2 = _truck modelToWorldWorld (_truck selectionPosition "Flatdeck_Intersect2Start");
-    private _frontPos2Dir = _truck modelToWorldWorld (_truck selectionPosition "Flatdeck_Intersect2End");
+    private _frontPos2Dir = _truck modelToWorldWorld (_truck selectionPosition "Flatdeck_Intersect2End")vectorAdd [-6,0,-1.5];
     private _frontPos3 = _truck modelToWorldWorld (_truck selectionPosition "Flatdeck_Intersect3Start");
-    private _frontPos3Dir = _truck modelToWorldWorld (_truck selectionPosition "Flatdeck_Intersect3End");
+    private _frontPos3Dir = _truck modelToWorldWorld (_truck selectionPosition "Flatdeck_Intersect3End")vectorAdd [-6,0,-1.5];
     private _frontPos4 = _truck modelToWorldWorld (_truck selectionPosition "Flatdeck_Intersect4Start");
-    private _frontPos4Dir = _truck modelToWorldWorld (_truck selectionPosition "Flatdeck_Intersect4End");
+    private _frontPos4Dir = _truck modelToWorldWorld (_truck selectionPosition "Flatdeck_Intersect4End")vectorAdd [-6,0,-1.5];
     private _frontPos5 = _truck modelToWorldWorld (_truck selectionPosition "Flatdeck_Intersect5Start");
-    private _frontPos5Dir = _truck modelToWorldWorld (_truck selectionPosition "Flatdeck_Intersect5End");
+    private _frontPos5Dir = _truck modelToWorldWorld (_truck selectionPosition "Flatdeck_Intersect5End")vectorAdd [-6,0,-1.5];
 
-    private _intersectBack = lineIntersectsObjs [_backPos, _BackPosDir, _truck];
-    private _intersectPastBack = [];
     private _intersectFront = ((attachedObjects _dummy)+(attachedObjects _truck)+(lineIntersectsObjs [_frontPos1, _frontPos1Dir, _truck])+(lineIntersectsObjs [_frontPos2, _frontPos2Dir, _truck])+(lineIntersectsObjs [_frontPos3, _frontPos3Dir, _truck])+(lineIntersectsObjs [_frontPos4, _frontPos4Dir, _truck])+(lineIntersectsObjs [_frontPos5, _frontPos5Dir, _truck]))-[_dummy];
     if (count _intersectFront < 1) exitwith {hint "No vehicle found";};
     
     for "_i" from 0 to 1000 do
 	{
-		_intersectBack = lineIntersectsObjs [_backPos, _BackPosDir, _truck];
         {
             _object = _x;
             // Ensure brakes are off and physics awake
@@ -306,19 +278,17 @@ ServerModules_fnc_towTruckAutoUnload = {
             // Update velocity
             _velocity set [1,_Yvector];
             _object setVelocityModelSpace _velocity;
-            if (_object IN _intersectBack && !(_object IN _intersectPastBack))then {_intersectPastBack pushBack _object};
-            hint format ["Step:%1",_i];
-            if (_i > highestSteps ) then {highestSteps = _i;};
+            hint format ["intersectFront:%1",_intersectFront];
+            if !(_object IN _objects) then {_objects pushBack _object;};
         } forEach _intersectFront;
-        if (_object IN _intersectPastBack && !(_object IN _intersectBack))exitwith{};
-        hint format ["intersectBack:%1 intersectPastBack:%2",_intersectBack,_intersectPastBack];
+        _intersectFront = ((attachedObjects _dummy)+(attachedObjects _truck)+(lineIntersectsObjs [_frontPos1, _frontPos1Dir, _truck])+(lineIntersectsObjs [_frontPos2, _frontPos2Dir, _truck])+(lineIntersectsObjs [_frontPos3, _frontPos3Dir, _truck])+(lineIntersectsObjs [_frontPos4, _frontPos4Dir, _truck])+(lineIntersectsObjs [_frontPos5, _frontPos5Dir, _truck]))-[_dummy];
+        if (count _intersectFront < 1)exitwith{};
         sleep 0.01;
 	};
-    if (count _intersectPastBack < 1)exitwith{};
+    if (count _objects < 1)exitwith{};
     {
         _x disableBrakes false;
-    } forEach _intersectPastBack;
-    hint format ["highestSteps:%1",highestSteps];
+    } forEach _objects;
 };
 ServerModules_fnc_attachRelativeMemory = {
     params [
