@@ -8,14 +8,14 @@ class EditorData
 	toggles=1;
 	class ItemIDProvider
 	{
-		nextID=43;
+		nextID=44;
 	};
 	class Camera
 	{
-		pos[]={9983.9473,140.3452,10015.911};
-		dir[]={0.59923214,-0.29930606,-0.74255532};
-		up[]={0.18797119,0.95415413,-0.23292951};
-		aside[]={-0.77823079,3.085006e-07,-0.62802225};
+		pos[]={9982.9727,144.65031,10025.274};
+		dir[]={0.298336,-0.46223983,-0.83517617};
+		up[]={0.15553318,0.8866936,-0.43541196};
+		aside[]={-0.94180864,-4.8875518e-07,-0.33642563};
 	};
 };
 binarizationWanted=0;
@@ -14857,16 +14857,16 @@ class Mission
 			dataType="Object";
 			class PositionInfo
 			{
-				position[]={9986.2324,140.63184,10006.793};
-				angles[]={-0,4.712389,0};
+				position[]={9983.9688,140.22272,10006.453};
+				angles[]={0,4.712389,0};
 			};
 			side="Empty";
 			flags=4;
 			class Attributes
 			{
 			};
-			id=42;
-			type="RetroRP_Forklift";
+			id=43;
+			type="RetroRP_Frontend_Loader";
 		};
 	};
 };

@@ -1,3 +1,4 @@
+RRP_ImpoundVehicles = [];
 vehicleInit = {
     params [["_truck", objNull], ["_object", objNull]];
     _truck animateSource ["flatdeck_body", 1, true];
@@ -120,9 +121,13 @@ ServerModules_fnc_towTruckAutoLoad = {
     private _boostStep = 0.01;
     private _boostMax  = 5;
     private _targetSpeed = 5;// Target speed in m/s (1 kph ≈ 0.27778)
+    
     private _object = objNull;
     private _exit = false;
     private _aligned = [];
+    private _alignmentObject = 0;
+    private _alignmentTruck = 0;
+    private _message = "";
     
     private _pos1 = (_truck selectionPosition "Flatdeck_AttachPoint_Rear");
     private _pos2 = _pos1 vectorAdd [0,-1,3];
@@ -146,28 +151,29 @@ ServerModules_fnc_towTruckAutoLoad = {
     if (count _intersectBack < 1) exitwith {hint "No vehicle found";};
     
     {
+        _object = _x;
+        
+        if ( _object IN RRP_ImpoundVehicles || ['EMS'] call ServerModules_fnc_getFaction || ['Cop'] call ServerModules_fnc_getFaction || (_object getVariable ['key', -1]) in RPF_vehKeys )exitWith { _exit = true;_message = "You're not allowed to tow this object";};
         // alignment of truck relative to _x (0..360)
-        private _alignment = [_truck, _x] call BIS_fnc_relativeDirTo;
-
+        _alignmentTruck = [_truck, _object] call BIS_fnc_relativeDirTo;
         // if truck is not roughly behind _x (outside 160..200) then bail out
-        if (_alignment < 179 || _alignment > 181) exitWith { _exit = true;};
+        if (_alignmentTruck < 170 || _alignmentTruck > 190) exitWith { _exit = true;_message = "Vehicle not positioned correctly";};
 
         // alignment of _x relative to truck (0..360)
-        private _alignmentTruck = [_x, _truck] call BIS_fnc_relativeDirTo;
-
-        if (_x isKindOf "RetroRP_Forklift" && _alignmentTruck < 170) exitWith { _exit = true;hint "Forklift must be loaded backwards";};
+        _alignmentObject = [_object, _truck] call BIS_fnc_relativeDirTo;
+        if (_object isKindOf "RetroRP_Forklift" && _alignmentObject < 170) exitWith { _exit = true;_message = "Forklift must be loaded backwards";};
 
         // if _x is facing roughly the same direction as the truck (within ±20° of 0/360)
-        if ((_alignmentTruck <= 10) || (_alignmentTruck >= 350)) exitWith { _x setDir (getDir _truck);_aligned pushBack _x; };
+        if ((_alignmentObject <= 10) || (_alignmentObject >= 350)) exitWith { _object setDir (getDir _truck);_aligned pushBack _object; };
         
         // if _x is facing roughly opposite the truck (within 160..200)
-        if (_alignmentTruck >= 170 && _alignmentTruck <= 190) exitWith { _x setDir (getDir _truck + 180);_aligned pushBack _x; };
-        
-        if (_exit || count _aligned < 1) exitWith {hint "Vehicle not positioned correctly"};
+        if (_alignmentObject >= 170 && _alignmentObject <= 190) exitWith { _object setDir (getDir _truck + 180);_aligned pushBack _object; };
 
     } forEach _intersectBack;
-    if (_exit || count _aligned < 1) exitWith {hint "Vehicle not positioned correctly";};
+    if (count _aligned < 1) then {_message = "Vehicle not positioned correctly";};
+    if (_exit) exitWith {hint format ["%1",_message];};
     
+    _object = objNull;
     for "_i" from 0 to 1000 do
 	{
 		{
@@ -212,6 +218,8 @@ ServerModules_fnc_towTruckAutoLoad = {
     _truck animateSource ["flatdeck_lift", 0];
     _truck animateSource ["flatdeck_slide", 0];
     waitUntil {_truck animationSourcePhase "flatdeck_lift" <= 0 && _truck animationSourcePhase "flatdeck_slide" <= 0};
+    [_truck] call ServerModules_fnc_TieDownVehicle;
+    
     _truck animateSource ["flatdeck_lift", 1];
     _truck animateSource ["flatdeck_slide", 1];
     waitUntil {_truck animationSourcePhase "flatdeck_lift" >= 1 && _truck animationSourcePhase "flatdeck_slide" >= 1};
