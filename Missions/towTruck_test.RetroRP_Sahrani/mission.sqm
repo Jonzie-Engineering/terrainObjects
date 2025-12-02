@@ -8,14 +8,14 @@ class EditorData
 	toggles=1;
 	class ItemIDProvider
 	{
-		nextID=44;
+		nextID=45;
 	};
 	class Camera
 	{
-		pos[]={9982.9727,144.65031,10025.274};
-		dir[]={0.298336,-0.46223983,-0.83517617};
-		up[]={0.15553318,0.8866936,-0.43541196};
-		aside[]={-0.94180864,-4.8875518e-07,-0.33642563};
+		pos[]={9985.5566,144.86435,10013.62};
+		dir[]={0.047102001,-0.71965557,-0.69287461};
+		up[]={0.048812542,0.6942687,-0.71805674};
+		aside[]={-0.99779314,-6.6671055e-07,-0.067831106};
 	};
 };
 binarizationWanted=0;
@@ -14857,16 +14857,16 @@ class Mission
 			dataType="Object";
 			class PositionInfo
 			{
-				position[]={9983.9688,140.22272,10006.453};
-				angles[]={0,4.712389,0};
+				position[]={9986.3721,139.76701,10006.801};
+				angles[]={0,1.5707964,0};
 			};
 			side="Empty";
 			flags=4;
 			class Attributes
 			{
 			};
-			id=43;
-			type="RetroRP_Frontend_Loader";
+			id=44;
+			type="RetroRP_F100";
 		};
 	};
 };

@@ -244,15 +244,38 @@ ServerModules_fnc_towTruckAutoUnload = {
     private _dummy = _truck getVariable ["RRP_attachToDummy", objNull];
     
     private _frontPos1 = _truck modelToWorldWorld (_truck selectionPosition "Flatdeck_IntersectStart");
-    private _frontPos1Dir = _truck modelToWorldWorld (_truck selectionPosition "Flatdeck_IntersectEnd")vectorAdd [-6,0,-1.5];
+    private _frontPos1Dir = _truck modelToWorldWorld (_truck selectionPosition "Flatdeck_IntersectEnd" vectorAdd [0,-6,-1.5]);
     private _frontPos2 = _truck modelToWorldWorld (_truck selectionPosition "Flatdeck_Intersect2Start");
-    private _frontPos2Dir = _truck modelToWorldWorld (_truck selectionPosition "Flatdeck_Intersect2End")vectorAdd [-6,0,-1.5];
+    private _frontPos2Dir = _truck modelToWorldWorld (_truck selectionPosition "Flatdeck_Intersect2End" vectorAdd [0,-6,-1.5]);
     private _frontPos3 = _truck modelToWorldWorld (_truck selectionPosition "Flatdeck_Intersect3Start");
-    private _frontPos3Dir = _truck modelToWorldWorld (_truck selectionPosition "Flatdeck_Intersect3End")vectorAdd [-6,0,-1.5];
+    private _frontPos3Dir = _truck modelToWorldWorld (_truck selectionPosition "Flatdeck_Intersect3End" vectorAdd [0,-6,-1.5]);
     private _frontPos4 = _truck modelToWorldWorld (_truck selectionPosition "Flatdeck_Intersect4Start");
-    private _frontPos4Dir = _truck modelToWorldWorld (_truck selectionPosition "Flatdeck_Intersect4End")vectorAdd [-6,0,-1.5];
+    private _frontPos4Dir = _truck modelToWorldWorld (_truck selectionPosition "Flatdeck_Intersect4End" vectorAdd [0,-6,-1.5]);
     private _frontPos5 = _truck modelToWorldWorld (_truck selectionPosition "Flatdeck_Intersect5Start");
-    private _frontPos5Dir = _truck modelToWorldWorld (_truck selectionPosition "Flatdeck_Intersect5End")vectorAdd [-6,0,-1.5];
+    private _frontPos5Dir = _truck modelToWorldWorld (_truck selectionPosition "Flatdeck_Intersect5End" vectorAdd [0,-6,-1.5]);
+
+
+    private _Ball = createVehicle ["Sign_Sphere25cm_F", [0,0,0], [], 0, "CAN_COLLIDE"];
+    _Ball setPosASL _frontPos1;
+    private _Ball2 = createVehicle ["Sign_Sphere25cm_F", [0,0,0], [], 0, "CAN_COLLIDE"];
+    _Ball2 setPosASL _frontPos1Dir;
+    private _Ball3 = createVehicle ["Sign_Sphere25cm_F", [0,0,0], [], 0, "CAN_COLLIDE"];
+    _Ball3 setPosASL _frontPos2;
+    private _Ball4 = createVehicle ["Sign_Sphere25cm_F", [0,0,0], [], 0, "CAN_COLLIDE"];
+    _Ball4 setPosASL _frontPos2Dir;
+    private _Ball5 = createVehicle ["Sign_Sphere25cm_F", [0,0,0], [], 0, "CAN_COLLIDE"];
+    _Ball5 setPosASL _frontPos3;
+    private _Ball6 = createVehicle ["Sign_Sphere25cm_F", [0,0,0], [], 0, "CAN_COLLIDE"];
+    _Ball6 setPosASL _frontPos3Dir;
+    private _Ball7 = createVehicle ["Sign_Sphere25cm_F", [0,0,0], [], 0, "CAN_COLLIDE"];
+    _Ball7 setPosASL _frontPos4;
+    private _Ball8 = createVehicle ["Sign_Sphere25cm_F", [0,0,0], [], 0, "CAN_COLLIDE"];
+    _Ball8 setPosASL _frontPos4Dir;
+    private _Ball9 = createVehicle ["Sign_Sphere25cm_F", [0,0,0], [], 0, "CAN_COLLIDE"];
+    _Ball9 setPosASL _frontPos5;
+    private _Ball10 = createVehicle ["Sign_Sphere25cm_F", [0,0,0], [], 0, "CAN_COLLIDE"];
+    _Ball10 setPosASL _frontPos5Dir;
+
 
     private _intersectFront = ((attachedObjects _dummy)+(attachedObjects _truck)+(lineIntersectsObjs [_frontPos1, _frontPos1Dir, _truck])+(lineIntersectsObjs [_frontPos2, _frontPos2Dir, _truck])+(lineIntersectsObjs [_frontPos3, _frontPos3Dir, _truck])+(lineIntersectsObjs [_frontPos4, _frontPos4Dir, _truck])+(lineIntersectsObjs [_frontPos5, _frontPos5Dir, _truck]))-[_dummy];
     if (count _intersectFront < 1) exitwith {hint "No vehicle found";};
@@ -411,7 +434,7 @@ ServerModules_fnc_attachRelativeMemory = {
 };
 */
 
-[towTruck1] spawn ServerModules_fnc_towTruckAutoLoad;
+[towTruck1] spawn ServerModules_fnc_towTruckAutoUnload;
 //towTruck1 animateSource ["flatdeck_lift", 0];towTruck1 animateSource ["flatdeck_slide", 0];
 
 /*
