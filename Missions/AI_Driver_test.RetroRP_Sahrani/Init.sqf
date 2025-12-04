@@ -1,6 +1,853 @@
 ServerModules_fnc_lockInventory = {};
 ServerModules_fnc_customize_Vehicles = {};
 ServerModules_fnc_ToggleLight = {};
+ServerModules_fnc_Vehicle_Init = {};
+servermodules_fnc_updateviewdistance = {};
+servermodules_fnc_eventhandlersvehicles = {};
+
+RRP_PublicFunctions = [];
+ClientModules_fnc_createVehicle = 
+{
+    params [["_class", nil], ["_position", [0,0,0]], ["_dir", 0], ["_garage", false], ["_unit", player]];
+
+    // Send a request to the server to create the vehicle with the specified parameters
+    [_unit, _class, _position, _dir, _garage] remoteExec ["ServerModules_fnc_createVehicle", 2];
+
+    // Retrieve the created vehicle from the player's "RRP_createVehicle" variable
+    _vehicle = _unit getVariable ["RRP_createVehicle",""];
+    //
+    [_unit] spawn 
+    {
+        params [["_unit", player]];
+        waitUntil { (_unit getVariable ["RRP_createVehicle",""]) isNotEqualTo ""};
+        sleep 10;
+        _unit setVariable ["RRP_createVehicle",nil];
+    };
+    // Return the created vehicle object
+    _vehicle
+};
+ServerModules_fnc_createVehicle = 
+{
+    /**
+    * Description:
+    *   Creates a vehicle at a specified position and direction, assigns ownership, locks inventory, 
+    *   and optionally inserts the vehicle into a garage or assigns keys to the player.
+    *
+    * Parameters:
+    *   0: OBJECT - The player object requesting the vehicle (default: objNull)
+    *   1: STRING - The vehicle class name to create (default: nil)
+    *   2: ARRAY  - The position [x, y, z] where the vehicle will be spawned (default: [0,0,0])
+    *   3: NUMBER - The direction the vehicle will face (default: 0)
+    *   4: BOOL   - Whether to insert the vehicle into the garage (default: false)
+    *
+    * Returns:
+    *   OBJECT - The created vehicle object
+    *
+    * Usage:
+    *   [_player, "C_Offroad_01_F", [1234,5678,0], 90, false] call ServerModules_fnc_createVehicle;
+    *
+    * Example:
+    *   private _veh = [player, "B_MRAP_01_F", getPos player, 180, true] call ServerModules_fnc_createVehicle;
+    *
+    * Author: Adam Duke
+    * (c) Copyright, Adam Duke. All Rights Reserved.
+    **/
+
+    // Parse parameters with default values
+    params [["_player", objNull], ["_class", nil], ["_position", [0,0,0]], ["_dir", 0], ["_garage", false]];
+    private _vehicle = objNull;
+
+    // If this function is being called via remote execution (from a client)
+    if (isRemoteExecuted) then {
+        // Exit if player object is null (invalid)
+        if (isNull _player) exitWith {};
+        // Get the remote execution owner's ID
+        private _playerID = remoteExecutedOwner;
+        // Exit if the remote execution owner is invalid (ID 0)
+        if (_playerID isEqualTo 0) exitWith { diag_log "# RRP loadInventory # - Invalid remoteexec owner"; };
+        // Security check: Ensure the player object matches the remote execution owner
+        if !((owner _player) isEqualTo _playerID) exitWith {
+            // Notify the client of a spoofing attempt
+            [[0], "You spoofed your network ID!", "Red"] remoteExec ["ClientModules_fnc_Notify", _playerID];
+        };
+    };
+
+    // Exit if the vehicle class is not defined
+    if (isNil "_class") exitWith {};
+
+    // Create the vehicle at [0,0,0] (will be moved later), with collision enabled
+    _vehicle = createVehicle [_class, [0,0,0], [], 0, "CAN_COLLIDE"];
+    _vehicle  allowDamage false; // Prevent damage to the vehicle during creation
+
+    // Store the created vehicle in the player's variable for reference, broadcast to network
+    _player setVariable ["RRP_createVehicle",_vehicle,true];
+
+    // Set a custom variable "HoodLock" to true and broadcast it over the network
+    _vehicle setVariable ["HoodLock", true, true];
+    // Lock the vehicle's inventory so players can't access it
+    [_vehicle,true] call ServerModules_fnc_lockInventory;
+    // Set the vehicle's direction
+    _vehicle setDir _dir;
+    // Move the vehicle to the desired position
+    _vehicle setPos _position;
+    // Lock the vehicle (lock level 2)
+    _vehicle lock 2;
+
+    // Enable dynamic simulation for performance, unless it's a debug class
+    if !(_vehicle isKindOf "RetroRP_DebugClass") then {
+        _vehicle enableDynamicSimulation true;
+    };
+
+    // Remove all items from the vehicle's cargo
+    clearItemCargoGlobal _vehicle;
+
+    // If called via remote execution (from a client)
+    if (isRemoteExecuted) then {
+        // Set the server-side owner of the vehicle to the player
+        [_vehicle, _player] call Server_fnc_setOwner;
+        // Wait 3 seconds, then initialize the vehicle on the client
+        [_vehicle, _player, _position, _dir] remoteExec ["ServerModules_fnc_Vehicle_Init", _player];
+    } else {
+        // If not remote executed, initialize the vehicle immediately on the server
+        [_vehicle,_player, _position, _dir] spawn ServerModules_fnc_Vehicle_Init;
+    };
+
+    // If a valid player is provided
+    if (_player isNotEqualTo objNull) then {
+        if (_garage) then {
+            // If garage flag is true, insert the vehicle into the player's garage
+            [_vehicle, _player, 0, 0, 0] remoteExecCall ["ServerModules_fnc_insertGarage", 2];
+        } else {
+            // Otherwise, assign the vehicle key to the player
+            [_vehicle, _player] remoteExecCall ["Server_fnc_insertKey", 2];
+        };
+    };
+
+    diag_log format ["# ServerModules_fnc_createVehicle #: Created vehicle %1 for player %2", _vehicle, name _player];
+    // Return the created vehicle object
+    _vehicle
+};
+Server_fnc_addPublicFunction = 
+{
+    /**
+    *  Description:
+    *      Adds one or more function names to the RRP_PublicFunctions array, making them publicly accessible.
+    *
+    *  Parameters:
+    *      0: _function (String or Array) - The function name (as a string) or an array of function names to add.
+    *
+    *  Returns:
+    *      Nothing
+    *
+    *  Usage:
+    *      ["myFunction"] call Server_fnc_addPublicFunction;
+    *      [["fnc_one", "fnc_two"]] call Server_fnc_addPublicFunction;
+    *
+    *  Example:
+    *      ["Server_fnc_example"] call Server_fnc_addPublicFunction;
+    *      [["Server_fnc_one", "Server_fnc_two"]] call Server_fnc_addPublicFunction;
+    *
+    *  Author: Adam Duke
+    *  (c) Copyright, Adam Duke. All Rights Reserved.
+    **/
+
+    // Accepts a parameter, defaulting to an empty string if not provided
+    params [["_function", ""]];
+
+    // Checks if _function is not defined or is not a string or array; if so, exit the script
+    if (isNil "_function" || (!(typeName _function isEqualTo "STRING") && !(typeName _function isEqualTo "ARRAY"))) exitWith {};
+
+    // If _function is a string, add it to the RRP_PublicFunctions array using pushBack
+    if (typeName _function isEqualTo "STRING") then {
+        RRP_PublicFunctions pushBack _function;
+    } else {
+        // If _function is an array, concatenate it to RRP_PublicFunctions
+        RRP_PublicFunctions = RRP_PublicFunctions + _function;
+    };
+};
+ServerModules_fnc_eventHandlersMan =
+{
+    /**
+    * Description:
+    *   Initializes and manages all player-related event handlers for the RRP Vehicles module.
+    *   Handles player interactions with vehicles, inventory, animations, and other gameplay mechanics.
+    *
+    * Parameters:
+    *   None (script is executed for the local player)
+    *
+    * Returns:
+    *   None
+    *
+    * Usage:
+    *   [] call ServerModules_fnc_eventHandlersMan;
+    *
+    * Example:
+    *   // Called automatically when player needs event handlers set up
+    *   [] call ServerModules_fnc_eventHandlersMan;
+    *
+    * Author: Jonzie
+    * (c) Copyright, Jonzie. All Rights Reserved.
+    *
+    *	https://community.bistudio.com/wiki/addEventHandler
+    *	https://community.bistudio.com/wiki/Arma_3:_Event_Handlers
+    */
+
+    // Update the player's view distance according to server settings
+    [] call ServerModules_fnc_updateViewDistance;
+
+    // Only proceed if the player needs event handlers set up
+    if !(player getVariable ["RRP_needsEH",true]) exitwith{};
+    player setVariable ["RRP_needsEH",false];
+
+    // Disable specific info panel components for the player (e.g., minimap, sensors)
+    {
+        player enableInfoPanelComponent ["right",_x,false];
+        player enableInfoPanelComponent ["left",_x,false];
+    } forEach [
+        "MineDetectorDisplayComponent",
+        "MinimapDisplayComponent",
+        "CrewDisplayComponent",
+        "TransportFeedDisplayComponent",
+        "SensorsDisplayComponent",
+        "SlingLoadDisplayComponent"
+    ];
+
+    // Add event handler for when the player gets into a vehicle
+    player addEventHandler ["GetInMan", 
+    {
+        params ["_unit", "_role", "_vehicle", "_turret"];
+
+        // If the vehicle needs event handlers, set them up after a short delay
+        if (_vehicle getVariable ["RRP_needsEH",true]) then {
+            [_vehicle] spawn {
+                params ["_vehicle"];
+                sleep 1;
+                [_vehicle] call ServerModules_fnc_eventHandlersVehicles;
+            };
+        };
+
+        private _notLocal = [];
+        private _towingArray = _vehicle getVariable ["RRP_TowingArray", []];
+        private _ropeFix = _vehicle getVariable ["RRP_Ropefix", objNull];
+
+        // Set up fuel consumption for the vehicle
+        [_vehicle] call ServerModules_fnc_setFuelConsumption;
+
+        // Stop escorting/escorted states if present
+        if (!(isNil {player getVariable 'escorted'})) then {
+            [player] spawn Client_fnc_escortStopReceive;
+            (player getVariable 'escort') forceWalk false;
+        };
+        if (!(isNil {player getVariable 'escorting'})) then {
+            [player getVariable 'escorting'] spawn Client_fnc_escortStop;
+        };
+
+        // Update view distance again (in case of vehicle change)
+        [] call ServerModules_fnc_updateViewDistance;
+
+        // Hide winch geometry if entering a winch vehicle
+        if (_vehicle isKindOf "RetroRP_RopeFix_Winch") then {
+            _vehicle animateSource ["Geo_Hide",1,true];
+        };
+
+        // Lower ladder if entering a crane, and mark as not local
+        if (_vehicle isKindOf "RetroRP_Crane") then {
+            _vehicle animateSource ["Lower_Ladder",1];
+            _notLocal pushBack _vehicle;
+        };
+
+        // Collect all attached objects and towing array objects that are not local
+        {
+            if !(local _x) then {_notLocal pushBack _x};
+        } forEach attachedObjects _vehicle;
+
+        {
+            if !(local _x) then {_notLocal pushBack _x};
+        } forEach _towingArray;
+
+        // Add ropefix object if present and not already in the list
+        if (!(isNull _ropeFix) && !(_ropeFix IN _notLocal)) then {
+            _notLocal pushBack _ropeFix;
+        };
+
+        // Disable info panel components for the vehicle
+        {
+            _vehicle enableInfoPanelComponent ["right",_x,false];
+            _vehicle enableInfoPanelComponent ["left",_x,false];
+        } forEach [
+            "MineDetectorDisplayComponent",
+            "MinimapDisplayComponent",
+            "CrewDisplayComponent",
+            "TransportFeedDisplayComponent",
+            "SensorsDisplayComponent",
+            "SlingLoadDisplayComponent"
+        ];
+
+        // PTO: If PTO or outriggers are active, set cruise control to low speed
+        if ((local _vehicle) && (_vehicle animationSourcePhase "PTO" >= 1 || _vehicle animationSourcePhase "Outriggers" > 0) && ((getCruiseControl _vehicle) select 0) <= 0) then {
+            _vehicle setCruiseControl [0.1, false];
+        };
+
+        // F100 Drill Arm: If drill arm is active, set cruise control to 10
+        if ((local _vehicle) && (_vehicle animationSourcePhase "drill_arm_position" > 0) && ((getCruiseControl _vehicle) select 0) < 10) then {
+            _vehicle setCruiseControl [10, false];
+        };
+
+        // Towing: If vehicle is a truck/car with towing array, call towing handler
+        if ((_vehicle isKindOf "Jonzie_RetroRP_truck_base" || _vehicle isKindOf "Jonzie_RetroRP_Car_Base") && (count(_towingArray)) > 1 && _role isEqualTo 'driver') then {
+            [_vehicle,_role,_unit] call ServerModules_fnc_Truck_GetIn;
+        };
+
+        // Frontend Loader: Start loader loop if driver and engine is on
+        if (_vehicle isKindOf "RetroRP_Frontend_Loader" && _role isEqualTo 'driver' && isEngineOn _vehicle) then {
+            [_vehicle] spawn ServerModules_fnc_Frontend_Loader_Loop;
+        };
+
+        // Manual Siren (commented out)
+        // if ( (_role isEqualTo 'driver' || ((_vehicle turretUnit [0]) isEqualTo _unit) ) && ("manual_siren" IN (animationNames _vehicle)) && (_vehicle animationSourcePhase 'Radio' >= 1) ) then { [_vehicle] spawn ServerModules_fnc_manualSiren;systemChat "spawn ServerModules_fnc_manualSiren"; };
+
+        // Aircraft: Prevent engine start if startup check fails
+        if ((_vehicle isKindOf "RetroRP_Seaking" || _vehicle isKindOf "RetroRP_Cessna172") && !([_vehicle] call ServerModules_fnc_StartupCheck) && isEngineOn _vehicle) exitWith {
+            _vehicle engineOn false;
+        };
+
+        // Seaking: If startup check passes and engine is on, start Seaking startup sequence
+        if (_vehicle isKindOf "RetroRP_Seaking" && ([_vehicle] call ServerModules_fnc_StartupCheck) && isEngineOn _vehicle) then {
+            [_vehicle,(currentPilot _vehicle)] spawn ServerModules_fnc_SeaKingStartup;
+        };
+
+        // Set ownership of non-local objects if driver or crane operator
+        if ((_role isEqualTo "driver" || _vehicle isKindOf "RetroRP_Crane") && _unit isEqualTo player && ((count _notLocal) > 0)) then {
+            [_notLocal,_unit] remoteExec ["Server_fnc_setOwner", 2];
+        };
+
+        if (_vehicle getVariable ["RRP_isTaxi", false] && local _vehicle) then 
+        {
+            if (_unit getVariable ["RRP_newPlayer",false]) then {RRP_NPCPanel_TaxiMainNewPlayer spawn ServerModules_fnc_createNPCDialog;}else{RRP_NPCPanel_TaxiMain spawn ServerModules_fnc_createNPCDialog;};
+        };
+
+    }];
+
+    // Add event handler for when the player gets out of a vehicle
+    player addEventHandler ["GetOutMan", 
+    {
+        params ["_unit", "_role", "_vehicle", "_turret"];
+
+        // Only run on client and if vehicle is local
+        if (isServer || !(local _vehicle)) exitwith {};
+
+        // If holstered, switch weapon
+        if (RPF_Holstered > 0.5) then {
+            player action ["SwitchWeapon", player, player, 100];
+        };
+
+        // If driver, animate trailer brake off
+        if (_role isEqualTo 'driver') then {
+            _vehicle animateSource ['TrailerBrake', 0];
+        };
+
+        // If restrained, play restrain gesture
+        if (player getVariable ["Restrained", false]) then {
+            player playAction "RetroRP_Gesture_restrain";
+        };
+
+        // Update view distance
+        [] call ServerModules_fnc_updateViewDistance;
+
+        // Show winch geometry if leaving winch vehicle
+        if (_vehicle isKindOf "RetroRP_RopeFix_Winch") then {
+            _vehicle animateSource ["Geo_Hide",0,true];
+        };
+
+        // Raise ladder if leaving crane
+        if (_vehicle isKindOf "RetroRP_Crane") then {
+            _vehicle animateSource ["Lower_Ladder",0];
+        };
+
+        // Stretcher: Remove carrier from vehicle if present
+        if (_vehicle isKindOf "RetroRP_Stretcher") then {
+            private _Carrier = fullCrew [_vehicle, "cargo",true]#1#0;
+            if (isPlayer _Carrier) then {
+                [_Carrier] remoteExecCall ["moveOut", _Carrier];
+            } else {
+                deleteVehicle _Carrier;
+            };
+            _vehicle animateSource ['Lift', 0];
+        };
+    }];
+
+    // Add event handler for when the player switches seats in a vehicle
+    player addEventHandler ["SeatSwitchedMan", {
+        params ["_unit1", "_unit2", "_vehicle"];
+
+        // Only run on client and if player is driver
+        if (isServer || (driver _vehicle) isNotEqualTo _unit1) exitwith {};
+
+        private _NotLocal = [];
+        {
+            if (!(local _x)) then {_NotLocal pushBack _x;};
+        } forEach attachedObjects _vehicle;
+
+        // Set ownership of non-local objects if any
+        if (count _NotLocal > 0) then {
+            [_NotLocal,_Trailer] remoteExec ["Server_fnc_setOwner", 2];
+        };
+
+        // If vehicle is truck/car with towing array, call seat switched handler
+        if ((_vehicle isKindOf "Jonzie_RetroRP_truck_base" || _vehicle isKindOf "Jonzie_RetroRP_Car_Base") && (count(_vehicle getVariable ["RRP_TowingArray", []])) > 1) then {
+            [_vehicle,_unit1,_unit2] call ServerModules_fnc_Truck_SeatSwitched;
+        };
+    }];
+
+    // Add event handler for when the player's animation changes
+    player addEventHandler ["AnimChanged", 
+    {
+        params ["_unit", "_anim"]; 
+
+        // If restrained, force weapon switch and play restrain gesture
+        if (player getVariable ["Restrained", false]) then {
+            if (primaryWeapon player != "" || secondaryWeapon player != "" || handgunWeapon  player != "") then {
+                []spawn{
+                    player action ["SwitchWeapon", player, player, 100];
+                    waitUntil{currentWeapon player == ""};
+                    sleep 2.2;
+                    player playAction "RetroRP_Gesture_restrain";
+                };
+            };
+            player playAction "RetroRP_Gesture_restrain";
+        };
+    }];
+
+    // Add event handler for when the player's animation is done
+    player addEventHandler ["AnimDone", 
+    {
+        params ["_unit", "_anim"]; 
+
+        // If restrained, force weapon switch and play restrain gesture
+        if (player getVariable ["Restrained", false]) then {
+            if (primaryWeapon player != "" || secondaryWeapon player != "" || handgunWeapon  player != "") then {
+                []spawn{
+                    player action ["SwitchWeapon", player, player, 100];
+                    waitUntil{currentWeapon player == ""};
+                    sleep 2.2;
+                    player playAction "RetroRP_Gesture_restrain";
+                };
+            };
+            player playAction "RetroRP_Gesture_restrain";
+        };
+    }];
+
+    // Add event handler for when the player's animation state changes
+    player addEventHandler ["AnimStateChanged", 
+    {
+        params ["_unit", "_anim"]; 
+
+        // If restrained, force weapon switch and play restrain gesture
+        if (player getVariable ["Restrained", false]) then {
+            if (primaryWeapon player != "" || secondaryWeapon player != "" || handgunWeapon  player != "") then {
+                []spawn{
+                    player action ["SwitchWeapon", player, player, 100];
+                    waitUntil{currentWeapon player == ""};
+                    sleep 2.2;
+                    player playAction "RetroRP_Gesture_restrain";
+                };
+            };
+            player playAction "RetroRP_Gesture_restrain";
+        };
+    }];
+
+    // Add event handler for when the player fires a weapon
+    player addEventHandler ["FiredMan", {
+        params ["_unit", "_weapon", "_muzzle", "_mode", "_ammo", "_magazine", "_projectile", "_vehicle"];
+
+        // If restrained, force weapon switch and play restrain gesture
+        if (player getVariable ["Restrained", false]) then {
+            if (primaryWeapon player != "" || secondaryWeapon player != "" || handgunWeapon  player != "") then {
+                []spawn{
+                    player action ["SwitchWeapon", player, player, 100];
+                    waitUntil{currentWeapon player == ""};
+                    sleep 2.2;
+                    player playAction "RetroRP_Gesture_restrain";
+                };
+            };
+            player playAction "RetroRP_Gesture_restrain";
+        };
+    }];
+
+    // Add event handler for when the player is killed
+    player addEventHandler ["Killed",
+    {    
+        params ["_unit", "_source", "_damage", "_instigator"];
+
+        // Uncuff, drop objects, set captive, stop escorting, and re-add event handlers if needed
+        [_unit] call Client_fnc_unCuff;
+        [] spawn Client_fnc_dropObject;
+        _unit setCaptive true;
+        // _unit spawn ClientModules_fnc_basicMedicalUnconscious;
+        [_unit] spawn Client_fnc_escortStopReceive;
+        if (_unit getVariable ["RRP_needsEH",true]) then {
+            [] call ServerModules_fnc_eventHandlersMan;
+        };
+
+        if !(isNil {player getVariable 'escorting'}) then {
+            [player getVariable 'escorting'] spawn Client_fnc_escortStop;
+        };
+    }];
+
+    // Add event handler for when the player takes damage
+    player addEventHandler ["HandleDamage", {
+        params ["_unit", "_selection", "_damage", "_source", "_projectile", "_hitIndex", "_instigator", "_hitPoint"];
+
+        // If hit by stun ammo, force ragdoll
+        if (_projectile isEqualTo "RetroRP_ammo_12g_Stun") then {
+            []call Client_fnc_forceragdoll;
+        };
+    }];
+
+    // Add event handler for when the player opens inventory
+    player removeAllEventHandlers "InventoryOpened";
+    player addEventHandler ["InventoryOpened", 
+    {
+        params ["_unit", "_container"];
+        _container setVariable ["In_Use",[_unit,true],true];
+        diag_log format ["# RRP EventHandler # InventoryOpened: unit=%1, container=%2", _unit, _container];
+
+        // Find nearby supplies (excluding self and container)
+        private _nearSupplies = (_unit nearSupplies 1)-[_unit,_container];
+        private _container2 = objNull;
+        _container2 = _nearSupplies select 0;
+        if (_unit isEqualTo player) then {
+            diag_log "# RRP EventHandler # Removing RetroRP_Cash magazines from player on inventory open";
+            _unit removeMagazines "RetroRP_Cash";
+        };
+
+        // If restrained, hands up, or container is locked/in use, close inventory
+        if ( lockedInventory _container|| _unit getVariable ["Restrained", false] || RRP_HandsUp  || _container getVariable ['RRP_objectLock', false] || _container getVariable ['HoodLock', false] ) exitwith 
+        {
+            diag_log "# RRP EventHandler # Inventory open blocked: Restrained/HandsUp/Locked/InUse/LockedInventory/HoodLock";
+            [] spawn ServerModules_fnc_closeInventory;
+            _container setVariable ["In_Use",nil,true];
+        };
+        // If nearby container is locked/in use, close inventory
+        if ( ((_container2 getVariable ['In_Use',['',false]])select 1) || _container2 getVariable ['RRP_objectLock', false] || _container2 getVariable ['HoodLock', false] ) exitwith {
+            diag_log "# RRP EventHandler # Inventory open blocked: Nearby container locked/in use/objectLock/HoodLock";
+            [] spawn ServerModules_fnc_closeInventory;
+            _container setVariable ["In_Use",nil,true];
+        };
+
+        // Mark container as in use, open inventory, and check for blacklisted objects
+        diag_log format ["# RRP EventHandler # Marking container %1 as in use by %2", _container, _unit];
+        
+        RRP_InventoryOpen = true;
+        [_container,_unit] spawn ServerModules_fnc_BlackListed_Objects;
+
+        // Mark nearby container as in use and check for blacklisted objects
+        if (!(isNull _container2)) then 
+        {
+            diag_log format ["# RRP EventHandler # Marking nearby container %1 as in use by %2", _container2, _unit];
+            if ( lockedInventory _container2|| _unit getVariable ["Restrained", false] || RRP_HandsUp  || _container2 getVariable ['RRP_objectLock', false] || _container2 getVariable ['HoodLock', false] ) exitwith 
+            {
+                diag_log "# RRP EventHandler # container2 Inventory open blocked: Restrained/HandsUp/Locked/InUse/LockedInventory/HoodLock";
+                [] spawn ServerModules_fnc_closeInventory;
+                _container setVariable ["In_Use",nil,true];
+            };
+        };
+
+        if !("RetroRP_Wallet" IN (magazines _unit)) then {
+            diag_log "# RRP EventHandler # Adding RetroRP_Wallet to uniform";
+            _unit addItemToUniform "RetroRP_Wallet";
+        };
+        if !(_container isKindOf "Man") then {
+            diag_log "# RRP EventHandler # Removing RetroRP_Wallet from container (if present)";
+            _container addMagazineCargoGlobal ["RetroRP_Wallet", -1000];
+        };
+    }];
+
+    // Add event handler for when the player closes inventory
+    player addEventHandler ["InventoryClosed", 
+    {
+        params ["_unit", "_container"];
+
+        // Find nearby supplies (excluding self and container)
+        private _nearSupplies = (_unit nearSupplies 1)-[_unit,_container];
+        private _container2 = objNull;
+        _container2 = _nearSupplies select 0;
+
+        // Mark container as not in use, close inventory, and check for blacklisted objects
+        _container setVariable ["In_Use",nil,true];
+        RRP_InventoryOpen = false;
+
+        // Re-enable simulation if needed
+        if (!(simulationEnabled _container) && _container getVariable ["disableSim", false]) then {
+            _container setVariable ["disableSim",nil,true];
+            [_container, false] remoteExec ['enableSimulationGlobal',2];
+        };
+
+        // Animate locker door and save object after delay if container is a locker
+        if (_container isKindOf "RetroRP_Locker") then {
+            _container animateSource ['Door_1',0.001];
+            [{
+                params ["_unit","_container"];
+                [_unit, _container] remoteExecCall ["ServerModules_fnc_saveObject", 2];
+            }, [_unit,_container], 5] call CBA_fnc_waitAndExecute;
+        };
+
+        // Re-enable simulation if container has TSM variable
+        if (_container getVariable ["TSM", false]) then {
+            [_container, false] remoteExec ["enableSimulationGlobal",2];
+        };
+
+        // Save object unless it's a ground weapon holder marked for saving
+        /*
+        private _ignoreList = ["GroundWeaponHolder"];
+        if !(typeOf _container in _ignoreList && _container getVariable ["RRP_saveObject",false]) then {
+            [_unit, _container] remoteExecCall ["ServerModules_fnc_saveObject", 2];
+        };
+        */
+
+        // Mark nearby container as not in use and check for blacklisted objects
+        if (!(isNull _container2)) then {
+            _container2 setVariable ["In_Use",nil,true];
+            //[_container2] spawn ServerModules_fnc_BlackListed_Objects;
+        };
+        if !("RetroRP_Wallet" IN (magazines _unit)) then {_unit addItemToUniform "RetroRP_Wallet";};
+    }];
+
+    // Add event handler for when the player takes an item
+    player addEventHandler ["Take", 
+    {
+        params ["_unit", "_container", "_item"];
+        
+        private _magCount = 0;
+        private _amount = 0;
+        private _dupable = getArray (configFile >> "RRP_Items" >> "DupableItems");
+
+        // Handle taking cash from container
+        if (_item == "RetroRP_Cash") then {
+            private _cash = 0;
+            private _log = "";
+            private _classname = "";
+            
+            { 
+                _classname = _x select 0; 
+                if (_classname == "RetroRP_Cash") then { 
+                    _cash = _cash + (_x select 1); 
+                }; 
+            } forEach magazinesAmmo _unit; 
+            
+            // Remove all cash magazines from player
+            if (_unit isEqualTo player) then {_unit removeMagazines "RetroRP_Cash";};
+
+            // Add cash to player and log transaction
+            if (_unit isEqualTo player && _cash > 0) then {
+                [_cash] call Client_fnc_addCash;
+                if (_container isKindOf "Man") then {
+                    _log = format ["%1|From%2",_cash,(name _container)];
+                    [_unit,"Cash Taken",_log,6] remoteExecCall ["ServerModules_fnc_log", 2];
+                } else {
+                    _log = format ["%1|From%2",_cash,(typeOf _container)];
+                    [_unit,"Cash Taken",_log,6] remoteExecCall ["ServerModules_fnc_log", 2];
+                };
+            };
+        };
+        if (_item == "RetroRP_Wallet") then {
+            _unit removeMagazines "RetroRP_Wallet";
+            _unit addItemToUniform "RetroRP_Wallet";
+        };
+        if (_item IN _dupable) then {[] spawn ServerModules_fnc_closeInventory;};
+        if !("RetroRP_Wallet" IN (magazines _unit)) then {_unit addItemToUniform "RetroRP_Wallet";};
+    }];
+
+    // Add event handler for when the player puts an item into a container
+    //player removeAllEventHandlers "Put";
+    player addEventHandler ["Put", 
+    {
+        params ["_unit", "_container", "_item"];
+        private _Pumpcheck = false;
+        private _amount = 0;
+        private _log = "";
+
+        // Check for blacklisted objects
+        //[_container] spawn ServerModules_fnc_BlackListed_Objects;
+
+        // Handle putting empty jerry can near petrol pump
+        if (_item == "RetroRP_JerryCanEmpty") then {
+            _Pumpcheck = (count(nearestObjects [_container, ["RetroRP_Petrol_Pump"], 10])) > 0;
+            if (_Pumpcheck) then {
+                [_container, "RetroRP_JerryCanEmpty",1] call CBA_fnc_removeMagazineCargo;
+                private _JerryCan = createVehicle ["RetroRP_JerryCanEmpty", [0,0,0], [], 0, "CAN_COLLIDE"];
+                RPF_ownedFurniture pushBack _JerryCan; 
+                _JerryCan setpos (getpos _container);
+                _JerryCan setdir(getdir _container)+180;
+                _JerryCan enableDynamicSimulation true;
+            };
+        };
+
+        // Handle putting wallet into container
+        if (_item == "RetroRP_Wallet") then {_container addMagazineCargoGlobal ["RetroRP_Wallet", -1000];};
+        if !("RetroRP_Wallet" IN (magazines _unit)) then {_unit addItemToUniform "RetroRP_Wallet";};
+    }];
+
+    // Add event handler for when the player respawns
+    player addEventHandler ["Respawn", 
+    {
+        params ["_unit", "_corpse"];
+
+        // Hospital stuff: set blood volume and respawn cost, assign hospital bed
+        private _bloodvolume = _corpse getVariable ["ace_medical_bloodvolume",0];
+        private _respawnCost = [_corpse] call ServerModules_fnc_getHealcost;
+        if (_bloodvolume < 3.6) then {_bloodvolume = 3.6;};
+        _unit setVariable ["ace_medical_bloodvolume",_bloodvolume,true];
+        _unit setVariable ["RRP_respawnCost",_respawnCost,true];
+        [_unit, true, true] remoteExecCall ["ServerModules_fnc_receiveHospitalBed", 2];
+
+        // Re-add event handlers if needed
+        if (_unit getVariable ["RRP_needsEH",true]) then {
+            [] call ServerModules_fnc_eventHandlersMan;
+        };
+        
+        // Remove all cash from player and transfer to corpse
+        private _amount = _unit getVariable ["Cash", 0];
+        if (_amount < 1) then {_amount = _corpse getVariable ["Cash", 0];};
+        [true, 0] call ace_medical_feedback_fnc_effectUnconscious;
+        [_unit] call ServerModules_fnc_randomizePlayer;
+
+        [_amount] call Client_fnc_removeCash;
+        _corpse removeMagazines "RetroRP_Wallet";
+        _corpse addMagazine ["RetroRP_Cash", _amount];
+        [_unit,"Killed Cash",format ["%1|To%2 corpse",_amount,name _corpse],4] remoteExecCall ["ServerModules_fnc_log", 2];
+    }];
+
+    // Log that event handlers have been initialized
+    diag_log "# [RRP] EventHandler: Unit EventHandlers Initalized #";
+};
+ServerModules_fnc_createNPCDialog =
+{    
+    /**
+    * Description:
+    *   Creates an interactive NPC dialog with customizable title, question, options, and conditions.
+    *   Displays a dialog to the player with up to 4 selectable options, each with its own condition and action.
+    *   Handles option pagination and conditional branching based on provided conditions.
+    *
+    * Parameters:
+    *   0: STRING - Dialog title.
+    *   1: STRING - Dialog question.
+    *   2: STRING (optional) - Condition to show the dialog (default: "true").
+    *   3: STRING (optional) - Message to show if the condition fails (default: "").
+    *   4: ARRAY  (optional) - Array of options. Each option: [title, condition, function] (default: []).
+    *   5: NUMBER (optional) - Start index for option pagination (default: 0).
+    *
+    * Returns:
+    *   Nothing.
+    *
+    * Usage:
+    *   [
+    *     "Bank Teller",
+    *     "What would you like to do?",
+    *     [
+    *       ["Withdraw Money", "player getVariable ['canWithdraw', false]", "hint 'Withdrawing money...';"],
+    *       ["Deposit Money", "true", "hint 'Depositing money...';"]
+    *     ]
+    *   ] spawn ServerModules_fnc_createNPCDialog;
+    *
+    * Example:
+    *   [
+    *     "Shopkeeper",
+    *     "How can I help you?",
+    *     [
+    *       ["Buy", "true", "hint 'Buying...';"],
+    *       ["Sell", "player getVariable ['canSell', false]", "hint 'Selling...';"]
+    *     ]
+    *   ] spawn ServerModules_fnc_createNPCDialog;
+    *
+    * Author: Adam Duke
+    * (c) Copyright, Adam Duke. All Rights Reserved
+    **/
+
+    // Parse parameters with default values
+    params [
+        "_title",         // Dialog title
+        "_question",      // Dialog question
+        ["_condition", "true"],      // Condition to show dialog
+        ["_failMessage", ""],        // Message if condition fails
+        ["_options", []],            // Array of options
+        ["_startIndex", 0]           // Start index for pagination
+    ];
+
+    // Evaluate the condition string to a boolean
+    _condition = call compile _condition;
+
+    // If the condition is false, show fail message and exit
+    if !(_condition) exitWith { [[0], _failMessage, "Red"] call ClientModules_fnc_Notify; };
+
+    // If there are no options, exit (nothing to show)
+    if (count _options isEqualTo 0) exitWith {};
+
+    // Prevent opening multiple dialogs at once
+    if !(isNil (uiNamespace getVariable ["RRP_NPC_Question", nil])) exitWith {};
+
+    // Create the dialog UI
+    waitUntil {player getVariable ["RRP_KeyPress", "UP"] isEqualTo "UP"};
+    createDialog "RRP_NPCDialog";
+
+    // Store dialog parameters in the UI namespace for later reference
+    uiNamespace setVariable ["RRP_NPC_Question", _this];
+
+    // Get the dialog display object
+    private _display = uiNamespace getVariable ["RRP_NPC_Display", displayNull];
+
+    // Get controls for title and question
+    private _titleCtrl = _display displayCtrl 1000;
+    private _questionCtrl = _display displayCtrl 1100;
+
+    // Set the dialog title and question text
+    _titleCtrl ctrlSetText _title;
+    _questionCtrl ctrlSetText _question;
+
+    // Track how many buttons have been added
+    private _buttonsAdded = 0;
+
+    // Iterate through each option
+    {
+        private _title = _x select 0;                // Option title
+        private _condition = call compile (_x select 1); // Option condition (evaluated)
+        private _function = _x select 2;             // Option action/function
+
+        // Skip options before the start index (for pagination)
+        if (_forEachIndex < _startIndex) then { } else {
+            // Only add the option if its condition is true
+            if (_condition) then {
+                private _button = _display displayCtrl (1600 + _buttonsAdded); // Get button control
+                _button ctrlEnable true; // Enable the button
+
+                // If more than 4 options, add a "More Options" button for pagination
+                if (_buttonsAdded isEqualTo 4) exitWith {
+                    // Set previous button to "More Options"
+                    private _button = _display displayCtrl (1600 + (_buttonsAdded - 1));
+                    _button ctrlSetText "More Options";
+
+                    // Prepare new parameters for next page
+                    private _newParams = _this;
+                    _newParams set [5, _forEachIndex - 1]; // Update start index
+                    _button buttonSetAction format ["%1 spawn ServerModules_fnc_createNPCDialog;", _newParams];
+                };
+
+                // Set button text and action
+                _button ctrlSetText _title;
+                _button buttonSetAction "closeDialog 0; uiNamespace setVariable ['RRP_NPC_Display', nil]; uiNamespace setVariable ['RRP_NPC_Question', nil];" + _function;
+
+                // Increment button count
+                _buttonsAdded = _buttonsAdded + 1;
+            };
+        };
+    } forEach _options;
+
+    // Disable any unused buttons (up to 4 total)
+    for "_i" from _buttonsAdded to 3 step 1 do {
+        private _button = _display displayCtrl (1600 + _i);
+        _button ctrlEnable false;
+    };
+};
 
 ServerModules_fnc_GPS_AStar = 
 {
@@ -2091,6 +2938,7 @@ ServerModules_fnc_taxiNPCPanels =
         publicVariable _x;
     } forEach _publicVar;
 };
+[] call ServerModules_fnc_taxiNPCPanels;
 ServerModules_fnc_taxiRouteLoop = 
 {
     params [ ["_veh", objNull] ];
@@ -2202,8 +3050,11 @@ ServerModules_fnc_taxiRouteLoop =
     [] call ServerModules_fnc_GPS_removeMarkers;
 };
 
-_startPos = [14624.7,11865.9,0];
-[_startPos,270] call ServerModules_fnc_createTaxi;
+_startPos = [9931.58,9952.64,0];
+[_startPos,90] call ServerModules_fnc_createTaxi;
+[] call ServerModules_fnc_eventHandlersMan;
+sleep 2;
+player action ['getInTurret', nearestObject [_startPos,"RetroRP_Monaco"], [0]];
 /*
 
 [[12630.4,9204.31,0],nearestObject [_startPos,"RetroRP_Monaco"]] spawn ServerModules_fnc_createTaxiRoute;
