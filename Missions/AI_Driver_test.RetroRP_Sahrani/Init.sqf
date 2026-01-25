@@ -849,6 +849,24 @@ ServerModules_fnc_createNPCDialog =
     };
 };
 
+ServerModules_fnc_GPS_calculationTime = 
+{
+    private _startPos = [13979.7,9842.65,0];
+    private _endPos = [14370.4,10764.4,0];
+    private _distance = _startPos distance2D _endPos;
+    private _startTime = time;
+    private _calculationTime = 0;
+    StartIndex = StartIndex + 1;
+    [_startPos, _endPos, StartIndex] spawn ServerModules_fnc_GPS_FindPath;
+    waitUntil {CalculatingRoute};
+    _startTime = time;
+    waitUntil {!CalculatingRoute};
+    _calculationTime = time - _startTime;
+    if (_calculationTime > 0) then {CalculationTime = time - _startTime;};
+    [] call ServerModules_fnc_GPS_removeMarkers;
+    waitUntil {count CurrentPath < 2};
+    NavPath = [];CurrentPath = [];GPSPathPos = [];StartIndex = 0;
+};
 ServerModules_fnc_GPS_AStar = 
 {
     /**
@@ -886,6 +904,8 @@ ServerModules_fnc_GPS_AStar =
     private _endPos = [];
     private _endObj = objNull;
     private _roadDir = -1;
+    private _calculationTime = CalculationTime;// time it takes to calculate a 1000m route
+    if (_calculationTime < 0.1) then {_calculationTime = 300;};
 
     // Remove any existing navigation markers from previous calculations
     [] call ServerModules_fnc_GPS_removeMarkers;
@@ -894,6 +914,9 @@ ServerModules_fnc_GPS_AStar =
     private _start = getPosATL ([_start, 100, RRP_falseRoads] call BIS_fnc_nearestRoad);
     private _end = getPosATL ([_end, 10000, RRP_falseRoads] call BIS_fnc_nearestRoad);
     private _startTime = time;
+    private _2dDistance = _start distance2D _end;
+    private _maxTime = (_2dDistance / 1000) * _CalculationTime; // Estimate max time based on distance
+    hint format ["maxTime:%1",_maxTime];
 
     // Prepare the list of all road nodes with their costs for A* algorithm
     // Node format: [pos, gcost, hcost, fcost, parent, roadObj]
@@ -919,7 +942,7 @@ ServerModules_fnc_GPS_AStar =
         // Exit if the route calculation index has changed (another calculation started)
         if (StartIndex != _index) exitWith {_returnMessage = "";};
         // Timeout after 2 minutes to prevent infinite loops
-        //if (time - _startTime > 600) exitWith { CalculatingRoute = false; _returnMessage = "A route could not be calculated in less than ten minutes!";[] spawn ServerModules_fnc_GPS_removeMarkers; };
+        if (time - _startTime > _maxTime) exitWith { CalculatingRoute = false; _returnMessage = "A route could not be calculated";[] spawn ServerModules_fnc_GPS_removeMarkers; };
 
         // Find the node in OPEN with the lowest f_cost (best candidate)
         private _currentNode = _nodes # 0;
@@ -1188,6 +1211,7 @@ ServerModules_fnc_GPS_InitClient =
 
     // Flag to indicate if a route is currently being calculated
     CalculatingRoute = false;
+    CalculationTime = 0;
 
     // Get all road objects within 100,000 meters of [0,0,0] (effectively all roads on the map)
 
@@ -2078,9 +2102,9 @@ ServerModules_fnc_createTaxiRoute =
     waitUntil {(count GPSPathPos) > 0};
     private _route = GPSPathPos;
     {
-        if (_x isNotEqualTo "") then 
+        _point = [_x#0,_x#1,_x#2];
+        if (_point isNotEqualTo "") then 
         {
-            _point = _x;
             if ( (count nearestLocations [_point, ["NameCity","NameCityCapital","NameVillage","Airport"], 500]) > 0 ) then {_point pushback 13.8;}else{_point pushback 16.6;};
         }else{_route = _route - [_x];};
     } forEach _route;
@@ -2938,7 +2962,6 @@ ServerModules_fnc_taxiNPCPanels =
         publicVariable _x;
     } forEach _publicVar;
 };
-[] call ServerModules_fnc_taxiNPCPanels;
 ServerModules_fnc_taxiRouteLoop = 
 {
     params [ ["_veh", objNull] ];
@@ -3049,14 +3072,14 @@ ServerModules_fnc_taxiRouteLoop =
     _veh setVariable ["RRP_taxiOnRoute", false, true];
     [] call ServerModules_fnc_GPS_removeMarkers;
 };
+sleep 2;
+[] spawn ServerModules_fnc_GPS_calculationTime;
+waitUntil {CalculationTime > 0};
+hint format ["CalculationTime: %1",CalculationTime];
+/*
 
 _startPos = [9931.58,9952.64,0];
 [_startPos,90] call ServerModules_fnc_createTaxi;
-[] call ServerModules_fnc_eventHandlersMan;
-sleep 2;
-player action ['getInTurret', nearestObject [_startPos,"RetroRP_Monaco"], [0]];
-/*
-
 [[12630.4,9204.31,0],nearestObject [_startPos,"RetroRP_Monaco"]] spawn ServerModules_fnc_createTaxiRoute;
 
 

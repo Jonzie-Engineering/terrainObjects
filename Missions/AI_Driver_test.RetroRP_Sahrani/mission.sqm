@@ -8,14 +8,14 @@ class EditorData
 	toggles=1;
 	class ItemIDProvider
 	{
-		nextID=139;
+		nextID=145;
 	};
 	class Camera
 	{
-		pos[]={13293.757,45.866352,8766.8135};
-		dir[]={0.058760662,-0.33194074,0.94148874};
-		up[]={0.02067693,0.94329274,0.33130714};
-		aside[]={0.99807644,2.861816e-08,-0.062293075};
+		pos[]={13504.473,174.79013,8839.4482};
+		dir[]={0.40305531,-0.35423276,0.84383982};
+		up[]={0.15267527,0.9351573,0.31964216};
+		aside[]={0.90235072,0,-0.43100268};
 	};
 };
 binarizationWanted=0;
@@ -41,13 +41,15 @@ addons[]=
 	"RetroRP_Defender",
 	"A3_Soft_F_Gamma_Hatchback_01",
 	"gm_characters_gc_civilians",
-	"gm_vehicles_land_wheeled_u1300l_ge_civ_u1300l"
+	"gm_vehicles_land_wheeled_u1300l_ge_civ_u1300l",
+	"gm_vehicles_land_wheeled_u1300l_ge_army_u1300l",
+	"gm_characters_ge_characters"
 };
 class AddonsMetaData
 {
 	class List
 	{
-		items=9;
+		items=11;
 		class Item0
 		{
 			className="RetroRP_Cars";
@@ -104,6 +106,20 @@ class AddonsMetaData
 			className="gm_vehicles_land_wheeled_u1300l_ge_civ_u1300l";
 			name="gm_vehicles_land_wheeled_u1300l_ge_civ_u1300l";
 		};
+		class Item9
+		{
+			className="gm_vehicles_land_wheeled_u1300l_ge_army_u1300l";
+			name="gm_vehicles_land_wheeled_u1300l_ge_army_u1300l";
+			author="Global Mobilization";
+			url="global-mobilization.com";
+		};
+		class Item10
+		{
+			className="gm_characters_ge_characters";
+			name="gm_characters_ge_characters";
+			author="Global Mobilization";
+			url="global-mobilization.com";
+		};
 	};
 };
 dlcs[]=
@@ -136,7 +152,7 @@ class Mission
 	};
 	class Entities
 	{
-		items=73;
+		items=75;
 		class Item0
 		{
 			dataType="Object";
@@ -7799,7 +7815,6 @@ class Mission
 					flags=6;
 					class Attributes
 					{
-						isPlayer=1;
 					};
 					id=17;
 					type="C_man_1";
@@ -8401,7 +8416,7 @@ class Mission
 				};
 			};
 			id=47;
-			atlOffset=-0.0015296936;
+			atlOffset=-0.001537323;
 		};
 		class Item28
 		{
@@ -8418,7 +8433,7 @@ class Mission
 			};
 			id=50;
 			type="gm_ge_civ_u1300l";
-			atlOffset=-0.0015296936;
+			atlOffset=-0.001537323;
 		};
 		class Item29
 		{
@@ -9997,7 +10012,7 @@ class Mission
 				};
 			};
 			id=123;
-			atlOffset=-0.0052528381;
+			atlOffset=-0.0052032471;
 		};
 		class Item66
 		{
@@ -10014,7 +10029,7 @@ class Mission
 			};
 			id=126;
 			type="gm_ge_civ_u1300l";
-			atlOffset=-0.0052528381;
+			atlOffset=-0.0052032471;
 		};
 		class Item67
 		{
@@ -10267,6 +10282,195 @@ class Mission
 			id=138;
 			type="gm_ge_civ_u1300l";
 			atlOffset=-0.0021629333;
+		};
+		class Item73
+		{
+			dataType="Object";
+			class PositionInfo
+			{
+				position[]={13981.127,26.995457,9843.9141};
+				angles[]={6.2721853,0.4867633,0.0039967569};
+			};
+			side="West";
+			flags=4;
+			class Attributes
+			{
+			};
+			id=141;
+			type="gm_ge_army_u1300l_firefighter";
+		};
+		class Item74
+		{
+			dataType="Group";
+			side="West";
+			class Entities
+			{
+				items=2;
+				class Item0
+				{
+					dataType="Object";
+					class PositionInfo
+					{
+						position[]={13980.488,24.512066,9842.6563};
+						angles[]={6.2721896,0.48675486,0.0039968039};
+					};
+					side="West";
+					flags=6;
+					class Attributes
+					{
+						isPlayer=1;
+					};
+					id=142;
+					type="gm_ge_army_rifleman_g3a3_80_ols";
+					class CustomAttributes
+					{
+						class Attribute0
+						{
+							property="gm_rankinsignia";
+							expression="[_this, [1,_value]] call gm_core_characters_fnc_setUnitAttribute;";
+							class Value
+							{
+								class data
+								{
+									singleType="STRING";
+									value="";
+								};
+							};
+						};
+						class Attribute1
+						{
+							property="gm_insigniacolor";
+							expression="[_this, [2,_value]] call gm_core_characters_fnc_setUnitAttribute;";
+							class Value
+							{
+								class data
+								{
+									singleType="STRING";
+									value="army_wht";
+								};
+							};
+						};
+						class Attribute2
+						{
+							property="face";
+							expression="_this setface _value;";
+							class Value
+							{
+								class data
+								{
+									singleType="STRING";
+									value="";
+								};
+							};
+						};
+						class Attribute3
+						{
+							property="pitch";
+							expression="_this setpitch _value;";
+							class Value
+							{
+								class data
+								{
+									singleType="SCALAR";
+									value=1;
+								};
+							};
+						};
+						class Attribute4
+						{
+							property="gm_rightarmband";
+							expression="[_this, [4,_value]] call gm_core_characters_fnc_setUnitAttribute;";
+							class Value
+							{
+								class data
+								{
+									singleType="STRING";
+									value="gm_ge_armband_none";
+								};
+							};
+						};
+						class Attribute5
+						{
+							property="gm_leftarmband";
+							expression="[_this, [3,_value]] call gm_core_characters_fnc_setUnitAttribute;";
+							class Value
+							{
+								class data
+								{
+									singleType="STRING";
+									value="gm_ge_armband_none";
+								};
+							};
+						};
+						class Attribute6
+						{
+							property="gm_servicebranch";
+							expression="[_this, [0,_value]] call gm_core_characters_fnc_setUnitAttribute;";
+							class Value
+							{
+								class data
+								{
+									singleType="STRING";
+									value="";
+								};
+							};
+						};
+						nAttributes=7;
+					};
+				};
+				class Item1
+				{
+					dataType="Object";
+					class PositionInfo
+					{
+						position[]={13980.479,26.97962,9842.6289};
+						angles[]={6.2721853,0.4867633,0.0039967569};
+					};
+					side="West";
+					class Attributes
+					{
+					};
+					id=143;
+					type="gm_ge_army_rifleman_g3a3_80_ols";
+					atlOffset=2.4678936;
+				};
+			};
+			class Attributes
+			{
+			};
+			class CrewLinks
+			{
+				class LinkIDProvider
+				{
+					nextID=2;
+				};
+				class Links
+				{
+					items=2;
+					class Item0
+					{
+						linkID=0;
+						item0=142;
+						item1=141;
+						class CustomData
+						{
+							role=1;
+						};
+					};
+					class Item1
+					{
+						linkID=1;
+						item0=143;
+						item1=141;
+						class CustomData
+						{
+							role=2;
+							turretPath[]={0};
+						};
+					};
+				};
+			};
+			id=144;
 		};
 	};
 };
